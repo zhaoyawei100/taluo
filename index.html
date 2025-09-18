@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神秘塔罗 - 在线占卜</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义主题 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6b21a8', // 主紫色
+                        secondary: '#d946ef', // 辅助粉色
+                        accent: '#f472b6', // 强调色
+                        dark: '#1e1b4b', // 深色背景
+                        light: '#f5f3ff', // 浅色文本
+                    },
+                    fontFamily: {
+                        tarot: ['Garamond', 'Georgia', 'serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }
+            .backdrop-blur {
+                backdrop-filter: blur(8px);
+            }
+            .card-flip {
+                transform-style: preserve-3d;
+                transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            .card-flip-active {
+                transform: rotateY(180deg);
+            }
+            .card-front, .card-back {
+                backface-visibility: hidden;
+            }
+            .card-back {
+                transform: rotateY(180deg);
+            }
+            .tarot-gradient {
+                background: linear-gradient(135deg, #1e1b4b 0%, #6b21a8 100%);
+            }
+            /* 牌尺寸优化，保持307×540的比例 */
+            .tarot-card {
+                transition: all 0.3s ease;
+                width: clamp(40px, 9vw, 100px);
+                height: calc(clamp(40px, 9vw, 100px) * 540 / 307);
+            }
+            .tarot-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+                z-index: 10;
+            }
+            /* 牌阵容器优化 - 确保完整展示所有行 */
+            .spread-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                padding: 1rem; /* 增加内边距确保边缘内容可见 */
+                margin: 0 auto;
+                box-sizing: border-box;
+                overflow: visible; /* 允许内容完整显示 */
+                min-height: 150px;
+                max-height: 75vh; /* 增加最大高度限制 */
+            }
+            .spread-row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                width: 100%;
+                gap: clamp(0.15rem, 0.5vw, 0.5rem);
+                margin-bottom: clamp(0.5rem, 1vw, 1rem); /* 增加行间距确保各行分离 */
+            }
+            .spread-grid {
+                display: grid;
+                width: 100%;
+                gap: clamp(0.15rem, 0.5vw, 0.5rem);
+            }
+            .tarot-card-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 0;
+                padding: 0;
+                flex: 0 0 auto;
+            }
+            /* 卡片下方说明文字容器 */
+            .card-info {
+                width: 100%;
+                min-height: 20px;
+                text-align: center;
+                padding: 0.1rem 0 0;
+                margin-top: 0.1rem;
+            }
+            /* 年运牌阵特殊样式 */
+            .year-spread-container {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem; /* 增加行间距 */
+                width: 100%;
+                overflow: visible;
+                max-height: 70vh;
+                padding: 0.5rem; /* 增加内边距 */
+            }
+            .year-spread-row {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: clamp(0.1rem, 0.3vw, 0.3rem);
+                width: 100%;
+            }
+            /* 周运牌阵样式 */
+            .week-spread-container {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem; /* 增加行间距 */
+                width: 100%;
+                padding: 0.5rem; /* 增加内边距 */
+            }
+            .week-spread-row {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: clamp(0.1rem, 0.3vw, 0.3rem);
+                width: 100%;
+            }
+            /* 金字塔牌阵特殊优化 - 解决顶部卡片被遮挡问题 */
+            .pyramid-spread {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem; /* 增加行间距 */
+                width: 100%;
+                padding: 1.5rem 0.5rem; /* 增加顶部和两侧内边距 */
+                box-sizing: border-box;
+            }
+            /* 十字牌阵优化 */
+            .cross-spread {
+                display: grid;
+                grid-template-columns: auto auto auto;
+                grid-template-rows: auto auto auto;
+                justify-content: center;
+                gap: 0.8rem; /* 增加间距 */
+                width: 100%;
+                padding: 1.5rem; /* 增加内边距避免边缘裁切 */
+                box-sizing: border-box;
+            }
+            /* 三行布局特殊优化 */
+            .three-row-layout {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem; /* 足够的行间距 */
+                width: 100%;
+                padding: 1rem 0.5rem; /* 上下内边距确保首末行完整显示 */
+            }
+            .three-row-layout .row {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: clamp(0.15rem, 0.5vw, 0.5rem);
+                width: 100%;
+            }
+            /* 牌阵卡片特殊样式 */
+            .spread-card {
+                border: 2px solid transparent;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+<body class="bg-dark text-light font-tarot min-h-screen overflow-x-hidden">
+    <!-- 背景装饰 -->
+    <div class="fixed inset-0 z-0 opacity-10">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/30 blur-3xl animate-spin-slow"></div>
+        <div class="absolute bottom-1/3 right-1/3 w-80 h-80 rounded-full bg-secondary/30 blur-3xl animate-spin-slow" style="animation-direction: reverse;"></div>
+    </div>
+
+    <!-- 导航栏 - 固定在顶部，始终可见 -->
+    <header class="relative z-50 backdrop-blur bg-dark/80 border-b border-primary/30 sticky top-0 transition-all duration-300">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-moon-o text-secondary text-2xl"></i>
+                <h1 class="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-secondary to-accent">神秘塔罗</h1>
+            </div>
+            
+            <button id="menu-toggle" class="md:hidden text-light text-xl">
+                <i class="fa fa-bars"></i>
+            </button>
+            
+            <nav id="main-nav" class="hidden md:flex items-center space-x-6">
+                <a href="#home" class="hover:text-secondary transition-colors duration-300">首页</a>
+                <a href="#spreads" class="hover:text-secondary transition-colors duration-300">牌阵</a>
+                <a href="#about" class="hover:text-secondary transition-colors duration-300">关于塔罗</a>
+                <a href="#contact" class="hover:text-secondary transition-colors duration-300">联系解牌</a>
+            </nav>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-dark/95 backdrop-blur border-b border-primary/30">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#home" class="py-2 hover:text-secondary transition-colors duration-300">首页</a>
+                <a href="#spreads" class="py-2 hover:text-secondary transition-colors duration-300">牌阵</a>
+                <a href="#about" class="py-2 hover:text-secondary transition-colors duration-300">关于塔罗</a>
+                <a href="#contact" class="py-2 hover:text-secondary transition-colors duration-300">联系解牌</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <!-- 英雄区域 -->
+        <section id="home" class="py-16 md:py-24 relative">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-12">
+                    <div class="md:w-1/2 space-y-6">
+                        <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-shadow-lg">
+                            探索命运的<br>
+                            <span class="bg-clip-text text-transparent bg-gradient-to-r from-secondary to-accent">神秘指引</span>
+                        </h2>
+                        <p class="text-lg md:text-xl text-light/80 max-w-lg">
+                            通过古老的塔罗智慧，揭示生命中的奥秘与可能。选择适合你的牌阵，开始一段自我探索之旅。
+                        </p>
+                        <div class="pt-4">
+                            <a href="#spreads" class="inline-block bg-gradient-to-r from-primary to-secondary text-white font-medium py-3 px-8 rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-1">
+                                开始占卜 <i class="fa fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-1/2 relative">
+                        <div class="relative w-full max-w-md mx-auto animate-float">
+                            <img src="https://w.taluo.com/skin/taluo18/images/banner_new.jpg" alt="塔罗牌组展示" class="rounded-lg shadow-2xl">
+                            <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-secondary/20 rounded-full blur-xl"></div>
+                            <div class="absolute -top-6 -left-6 w-32 h-32 bg-primary/20 rounded-full blur-xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 牌阵选择区域 -->
+        <section id="spreads" class="py-16 bg-gradient-to-b from-dark to-dark/90">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-shadow">选择牌阵</h2>
+                    <p class="text-light/70 max-w-2xl mx-auto">
+                        不同的牌阵适用于不同的问题和情境。选择一个牌阵，专注于你的问题，然后抽取塔罗牌获得指引。
+                    </p>
+                </div>
+                
+                <!-- 牌阵分类标签 -->
+                <div class="flex flex-wrap justify-center gap-2 mb-12">
+                    <button class="spread-filter active px-4 py-2 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors" data-filter="all">全部</button>
+                    <button class="spread-filter px-4 py-2 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors" data-filter="basic">基础牌阵</button>
+                    <button class="spread-filter px-4 py-2 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors" data-filter="love">爱情相关</button>
+                    <button class="spread-filter px-4 py-2 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors" data-filter="career">事业相关</button>
+                    <button class="spread-filter px-4 py-2 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors" data-filter="choice">选择决策</button>
+                    <button class="spread-filter px-4 py-2 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors" data-filter="timeline">时间运势</button>
+                </div>
+                
+                <!-- 牌阵网格 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 单张牌阵 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="basic">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">单张牌 <span class="text-secondary text-sm ml-1">1张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">快速获得对当前情况的简要指引，适合简单问题。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="single">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 3张通用 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="basic">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">3张通用 <span class="text-secondary text-sm ml-1">3张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">通用型牌阵，从三个基本角度分析问题，适合各种情况。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="three-general">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 3张时间流 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="timeline">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">3张时间流 <span class="text-secondary text-sm ml-1">3张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">探索过去、现在和未来的发展趋势，了解时间线中的关键因素。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="three-timeline">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 3张问题解决方案 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="basic">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">问题解决方案 <span class="text-secondary text-sm ml-1">3张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">针对特定问题，分析现状、挑战和可能的解决方案。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="three-solution">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 4张牌阵 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="basic">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">4张牌阵 <span class="text-secondary text-sm ml-1">4张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">从四个不同角度分析问题：现状、挑战、机遇和建议。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="four-card">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 恋人金字塔 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="love">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">恋人金字塔 <span class="text-secondary text-sm ml-1">4张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">深入探索爱情关系，分析双方感受、关系现状和发展前景。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="lover-pyramid">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 爱情大十字 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="love">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">爱情大十字 <span class="text-secondary text-sm ml-1">5张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">全面剖析爱情关系中的关键因素、挑战和可能的结果。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="love-cross">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 事业金字塔 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="career">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">事业金字塔 <span class="text-secondary text-sm ml-1">6张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">分析职业发展状况、潜在机会、挑战和未来前景。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="career-pyramid">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 事业十字 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="career">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">事业十字 <span class="text-secondary text-sm ml-1">5张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">聚焦职业现状、挑战、机遇和可能的发展方向。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="career-cross">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 二选一 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="choice">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">二选一 <span class="text-secondary text-sm ml-1">5张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">当面临两个选择时，分析每个选项的利弊和可能结果。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="two-choices">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 三选一 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="choice">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">三选一 <span class="text-secondary text-sm ml-1">7张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">面对三个选项时，全面分析每个选择的潜力和可能发展。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="three-choices">
+                            开始占卜
+                        </button>
+                    </div>
+                    
+                    <!-- 周运 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="timeline">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">周运势 <span class="text-secondary text-sm ml-1">7张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">预测未来一周的每日运势，第一排3天，第二排4天，把握每周趋势。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="weekly">
+                            开始占卜
+                        </button>
+                    </div>
+
+                    <!-- 月运 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="timeline">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">月运势 <span class="text-secondary text-sm ml-1">5张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">预测未来一个月的每周运势及整体概况，把握月度趋势。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="monthly">
+                            开始占卜
+                        </button>
+                    </div>
+
+                    <!-- 新年12月运 -->
+                    <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="timeline">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold text-center w-full">新年12月运 <span class="text-secondary text-sm ml-1">12张</span></h3>
+                        </div>
+                        <p class="text-light/70 mb-4">展望新一年的每月运势，揭示每个月的主要趋势和重要时期。</p>
+                        <button class="start-reading w-full py-2 rounded-lg bg-primary/30 hover:bg-primary/50 transition-colors" data-spread="yearly">
+                            开始占卜
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 占卜区域 -->
+        <section id="reading-area" class="py-16 hidden">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 id="spread-title" class="text-3xl md:text-4xl font-bold mb-4 text-shadow">塔罗占卜</h2>
+                    <p id="spread-description" class="text-light/70 max-w-2xl mx-auto">
+                        请专注于你的问题，然后点击下方按钮开始抽牌。
+                    </p>
+                </div>
+                
+                <!-- 问题输入 -->
+                <div class="max-w-2xl mx-auto mb-10">
+                    <label for="question" class="block mb-2 text-lg">你的问题：</label>
+                    <textarea id="question" class="w-full bg-dark/50 border border-primary/30 rounded-lg p-4 text-light focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary transition-all" rows="3" placeholder="请输入你想询问的问题，例如：我的爱情会有新的发展吗？"></textarea>
+                </div>
+                
+                <!-- 抽牌按钮 -->
+                <div class="text-center mb-10">
+                    <button id="draw-cards" class="bg-gradient-to-r from-primary to-secondary text-white font-medium py-3 px-8 rounded-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-50 disabled:pointer-events-none">
+                        <i class="fa fa-random mr-2"></i> 开始抽牌
+                    </button>
+                </div>
+                
+                <!-- 牌阵展示区 - 确保完整展示所有行 -->
+                <div id="spread-container" class="spread-container min-h-[150px] mb-10 max-w-7xl mx-auto">
+                    <!-- 牌阵将在这里动态生成 -->
+                    <div class="text-light/50 text-center">
+                        <i class="fa fa-hand-o-down text-3xl mb-4 block animate-bounce"></i>
+                        选择牌阵并点击抽牌按钮开始
+                    </div>
+                </div>
+                
+                <!-- 牌义解释区 -->
+                <div id="card-meaning" class="max-w-4xl mx-auto bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 mt-8 mb-6 hidden">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center">
+                        <span id="meaning-card-name" class="mr-2"></span>
+                        <span id="meaning-card-orientation" class="text-sm bg-primary/20 text-secondary px-2 py-1 rounded-full"></span>
+                    </h3>
+                    <div class="prose prose-invert max-w-none">
+                        <p id="meaning-description">
+                            <!-- 牌义解释将在这里显示 -->
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 重新占卜按钮 -->
+                <div class="text-center mt-10">
+                    <button id="restart-reading" class="py-2 px-6 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors">
+                        <i class="fa fa-refresh mr-2"></i> 重新占卜
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关于塔罗 -->
+        <section id="about" class="py-16 bg-gradient-to-b from-dark/90 to-dark">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row gap-12 items-center">
+                    <div class="md:w-1/2">
+                        <img src="https://picsum.photos/id/175/600/400" alt="塔罗牌背景" class="rounded-xl shadow-xl w-full h-auto">
+                    </div>
+                    
+                    <div class="md:w-1/2 space-y-6">
+                        <h2 class="text-3xl md:text-4xl font-bold text-shadow">关于塔罗牌</h2>
+                        <p class="text-light/80">
+                            塔罗牌是一种古老的占卜工具，起源于15世纪的欧洲。它由78张牌组成，包括22张大阿卡那牌和56张小阿卡那牌。
+                        </p>
+                        <p class="text-light/80">
+                            塔罗牌不仅仅是占卜工具，更是一面镜子，帮助我们探索内心深处的想法、感受和潜在的可能性。它不预测确定的未来，而是揭示当前能量状态下可能的发展趋势。
+                        </p>
+                        <p class="text-light/80">
+                            通过塔罗牌占卜，我们可以获得对生活、爱情、事业等方面的新视角，从而做出更明智的决策。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系解牌 -->
+        <section id="contact" class="py-16">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-shadow">人工解牌服务</h2>
+                    <p class="text-light/70 max-w-2xl mx-auto">
+                        如果您对占卜结果有疑问，或希望获得更深入的解读，可以添加下方微信联系专业塔罗师进行一对一解牌。
+                    </p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center justify-center gap-12">
+                    <div class="bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 w-full max-w-sm text-center">
+                        <div class="mb-4">
+                            <img src="https://picsum.photos/id/1/300/300" alt="微信二维码" class="w-64 h-64 mx-auto rounded-lg border-4 border-primary/30">
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">微信扫码联系</h3>
+                        <p class="text-light/70">添加时请注明"塔罗解牌"</p>
+                    </div>
+                    
+                    <div class="w-full max-w-md space-y-4">
+                        <h3 class="text-2xl font-bold">解牌服务说明</h3>
+                        <ul class="space-y-3 text-light/80">
+                            <li class="flex items-start">
+                                <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                <span>专业塔罗师一对一在线解读</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                <span>深入分析牌阵含义，解答您的疑问</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                <span>提供个性化建议和行动指引</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fa fa-check-circle text-secondary mt-1 mr-3"></i>
+                                <span>灵活的咨询时间，满足您的需求</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="py-8 border-t border-primary/30 relative z-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i class="fa fa-moon-o text-secondary"></i>
+                        <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-secondary to-accent">神秘塔罗</h2>
+                    </div>
+                    <p class="text-light/60 text-sm">探索命运的神秘指引</p>
+                </div>
+                
+                <div class="flex space-x-6">
+                    <a href="#" class="text-light/60 hover:text-secondary transition-colors">
+                        <i class="fa fa-weibo text-xl"></i>
+                    </a>
+                    <a href="#" class="text-light/60 hover:text-secondary transition-colors">
+                        <i class="fa fa-wechat text-xl"></i>
+                    </a>
+                    <a href="#" class="text-light/60 hover:text-secondary transition-colors">
+                        <i class="fa fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-primary/20 text-center text-light/40 text-sm">
+                <p>免责声明：塔罗占卜仅供娱乐和参考，不构成任何决策建议。</p>
+                <p class="mt-2">&copy; 2023 神秘塔罗 - 保留所有权利</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-primary/80 hover:bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 opacity-0 invisible z-50">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // 塔罗牌数据
+        const tarotCards = [
+            { name: "愚人", upright: "https://w.taluo.com/pa/yrz.jpg", reversed: "https://w.taluo.com/pa/yrn.jpg", meaning: "愚人代表着新的开始、冒险和自由。正位时，它鼓励你拥抱未知，跟随直觉勇敢前行。这张牌象征着天真、 spontaneity 和对生活的热情。" },
+            { name: "魔术师", upright: "https://w.taluo.com/pa/mfsz.jpg", reversed: "https://w.taluo.com/pa/mfsn.jpg", meaning: "魔术师代表着创造力、行动力和资源的掌握。正位时，它显示你拥有实现目标所需的全部能力和资源，只需集中精力和意志即可成功。" },
+            { name: "女祭司", upright: "https://w.taluo.com/pa/njsz.jpg", reversed: "https://w.taluo.com/pa/njsn.jpg", meaning: "女祭司象征着直觉、神秘和内在智慧。正位时，它鼓励你相信自己的直觉，探索潜意识的深处，寻找答案。这张牌也代表着保密和谨慎。" },
+            { name: "女皇", upright: "https://w.taluo.com/pa/nhz.jpg", reversed: "https://w.taluo.com/pa/nhn.jpg", meaning: "女皇代表着丰饶、母性和创造力。正位时，它象征着繁荣、舒适和物质上的满足。这张牌鼓励你享受生活的美好，培养人际关系和创造力。" },
+            { name: "皇帝", upright: "https://w.taluo.com/pa/hdz.jpg", reversed: "https://w.taluo.com/pa/hdn.jpg", meaning: "皇帝象征着权威、结构和控制。正位时，它代表着领导力、自律和成功的管理能力。这张牌提醒你要为自己的生活负责，建立稳定的基础。" },
+            { name: "教皇", upright: "https://w.taluo.com/pa/jhz.jpg", reversed: "https://w.taluo.com/pa/jhn.jpg", meaning: "教皇代表着传统、灵性和指导。正位时，它象征着宗教信仰、道德价值观和社会规范。这张牌鼓励你寻求智慧和指导，尊重传统和权威。" },
+            { name: "恋人", upright: "https://w.taluo.com/pa/lrz.jpg", reversed: "https://w.taluo.com/pa/lrn.jpg", meaning: "恋人象征着爱情、选择和和谐。正位时，它代表着浪漫关系、重要的选择和价值观的 alignment。这张牌提醒你要做出基于内心真实感受的选择。" },
+            { name: "战车", upright: "https://w.taluo.com/pa/zcz.jpg", reversed: "https://w.taluo.com/pa/zcn.jpg", meaning: "战车代表着意志、控制和胜利。正位时，它象征着克服障碍的决心、自律和成功的动力。这张牌鼓励你集中精力，勇往直前。" },
+            { name: "力量", upright: "https://w.taluo.com/pa/llz.jpg", reversed: "https://w.taluo.com/pa/lln.jpg", meaning: "力量象征着内在力量、勇气和温柔。正位时，它代表着通过温柔而非暴力来克服挑战，展现真正的力量和同情心。" },
+            { name: "隐者", upright: "https://w.taluo.com/pa/ysz.jpg", reversed: "https://w.taluo.com/pa/ysn.jpg", meaning: "隐者代表着智慧、内省和孤独。正位时，它鼓励你花时间独处，反思生活，寻找内在的真理和智慧。这张牌象征着成熟和智慧的积累。" },
+            { name: "命运之轮", upright: "https://w.taluo.com/pa/myzlz.jpg", reversed: "https://w.taluo.com/pa/myzln.jpg", meaning: "命运之轮象征着变化、机遇和命运。正位时，它代表着生活中的转折点，好运的到来和自然的循环。这张牌提醒你接受变化是生活的一部分。" },
+            { name: "正义", upright: "https://w.taluo.com/pa/zyz.jpg", reversed: "https://w.taluo.com/pa/zyn.jpg", meaning: "正义代表着公平、平衡和责任。正位时，它象征着公正的对待，因果报应和道德的选择。这张牌提醒你要为自己的行为负责，保持平衡。" },
+            { name: "倒吊人", upright: "https://w.taluo.com/pa/ddrz.jpg", reversed: "https://w.taluo.com/pa/ddrn.jpg", meaning: "倒吊人象征着牺牲、等待和新的视角。正位时，它代表着自愿的牺牲，耐心等待和从不同角度看待问题的能力。这张牌鼓励你放下控制，接受现状。" },
+            { name: "节制", upright: "https://w.taluo.com/pa/jzz.jpg", reversed: "https://w.taluo.com/pa/jzn.jpg", meaning: "节制代表着平衡、和谐和适度。正位时，它象征着情绪的平衡，健康的生活方式和资源的合理使用。这张牌鼓励你在生活的各个方面寻找平衡。" },
+            { name: "恶魔", upright: "https://w.taluo.com/pa/emz.jpg", reversed: "https://w.taluo.com/pa/emn.jpg", meaning: "恶魔象征着诱惑、束缚和物质主义。正位时，它代表着被欲望、恐惧或坏习惯所束缚，无法自由行动。这张牌提醒你要认清自己的限制，寻找解脱的方法。" },
+            { name: "高塔", upright: "https://w.taluo.com/pa/gtz.jpg", reversed: "https://w.taluo.com/pa/gtn.jpg", meaning: "高塔代表着突然的变化、混乱和解放。正位时，它象征着旧有结构的崩溃，突如其来的变故和必要的破坏。这张牌提醒你要接受变化，即使它带来痛苦。" },
+            { name: "星星", upright: "https://w.taluo.com/pa/xxz.jpg", reversed: "https://w.taluo.com/pa/xxn.jpg", meaning: "星星象征着希望、灵感和灵性。正位时，它代表着乐观、梦想的实现和精神上的指引。这张牌鼓励你保持希望，追随自己的梦想。" },
+            { name: "月亮", upright: "https://w.taluo.com/pa/ylz.jpg", reversed: "https://w.taluo.com/pa/yln.jpg", meaning: "月亮代表着不确定性、恐惧和潜意识。正位时，它象征着迷茫、焦虑和隐藏的恐惧。这张牌提醒你要面对自己的恐惧，寻找真相。" },
+            { name: "太阳", upright: "https://w.taluo.com/pa/tyz.jpg", reversed: "https://w.taluo.com/pa/tyn.jpg", meaning: "太阳象征着快乐、成功和活力。正位时，它代表着幸福、成就和积极的能量。这张牌带来光明和温暖，预示着成功和满足。" },
+            { name: "审判", upright: "https://w.taluo.com/pa/spz.jpg", reversed: "https://w.taluo.com/pa/spn.jpg", meaning: "审判代表着重生、觉醒和评估。正位时，它象征着自我反省，重大的决定和新的开始。这张牌鼓励你面对自己的过去，做出必要的改变。" },
+            { name: "世界", upright: "https://w.taluo.com/pa/sjz.jpg", reversed: "https://w.taluo.com/pa/sjn.jpg", meaning: "世界象征着完成、圆满和旅行。正位时，它代表着一个阶段的结束，成功的完成和满足感。这张牌预示着新的冒险和机会即将到来。" }
+        ];
+
+        // 牌阵配置
+        const spreads = {
+            "single": {
+                name: "单张牌",
+                description: "单张牌阵是最简单的塔罗牌阵，适合快速获得对当前情况的简要指引。它可以回答简单直接的问题，提供一个清晰的视角。",
+                cardCount: 1,
+                positions: ["当前情况的核心"]
+            },
+            "three-general": {
+                name: "3张通用",
+                description: "3张通用牌阵是最常用的塔罗牌阵之一，适合各种类型的问题。它提供三个基本角度的分析，帮助你全面了解情况。",
+                cardCount: 3,
+                positions: ["第1张", "第2张", "第3张"]
+            },
+            "three-timeline": {
+                name: "3张时间流",
+                description: "3张时间流牌阵专注于时间的推移，帮助你理解事情如何发展。它揭示了过去的根源、现在的状态和未来可能的结果。",
+                cardCount: 3,
+                positions: ["过去", "现在", "未来"]
+            },
+            "three-solution": {
+                name: "问题解决方案",
+                description: "这个牌阵专为解决特定问题而设计，帮助你分析问题的本质、面临的挑战以及可能的解决方案。",
+                cardCount: 3,
+                positions: ["问题本质", "挑战", "解决方案"]
+            },
+            "four-card": {
+                name: "4张牌阵",
+                description: "4张牌阵从四个不同角度分析问题，提供全面的视角。它可以帮助你了解现状、挑战、机遇和应对建议。",
+                cardCount: 4,
+                positions: ["现状", "挑战", "机遇", "建议"]
+            },
+            "lover-pyramid": {
+                name: "恋人金字塔",
+                description: "恋人金字塔牌阵深入探索爱情关系，分析双方的感受、关系中的现状和未来的发展前景。",
+                cardCount: 4,
+                positions: ["1.代表你自己", "2.代表你的恋人", "3.你们彼此的关系", "4.你们未来的发展"]
+            },
+            "love-cross": {
+                name: "爱情大十字",
+                description: "爱情大十字牌阵全面剖析爱情关系，揭示关系的核心、挑战、外部影响和可能的结果。",
+                cardCount: 5,
+                positions: ["1.自己目前的心情及想法", "2.对方现在的心理及态度", "3.彼此现在的状况", "4.目前周遭的环境情况", "5.彼此关系最后的结果"]
+            },
+            "career-pyramid": {
+                name: "事业金字塔",
+                description: "事业金字塔牌阵分析你的职业发展状况，包括当前状态、潜在机会、挑战和未来前景。",
+                cardCount: 6,
+                positions: ["当前职业状态", "优势", "挑战", "潜在机会", "需要的行动", "未来前景"]
+            },
+            "career-cross": {
+                name: "事业十字",
+                description: "事业十字牌阵聚焦于你的职业发展，帮助你了解现状、挑战、机遇和可能的发展方向。",
+                cardCount: 5,
+                positions: ["当前职业状态", "主要挑战", "潜在机遇", "需要的行动", "可能的结果"]
+            },
+            "two-choices": {
+                name: "二选一",
+                description: "当你面临两个选择时，这个牌阵可以帮助你分析每个选项的利弊和可能的结果，以便做出更明智的决策。",
+                cardCount: 5,
+                positions: ["1.你的真实需求", "2.选择A的发展", "3.选择A的结果", "4.选择B的发展", "5.选择B的结果"]
+            },
+            "three-choices": {
+                name: "三选一",
+                description: "当你面临三个选择时，这个牌阵可以全面分析每个选择的潜力、挑战和可能的发展，帮助你做出最佳决策。",
+                cardCount: 7,
+                positions: ["1.你的真实需求", "2.选择A的发展", "3.选择B的发展", "4.选择C的发展", "5.选择A的结果", "6.选择B的结果", "7.选择C的结果"]
+            },
+            "weekly": {  // 周运牌阵
+                name: "周运势",
+                description: "周运势牌阵预测未来一周的每日运势，帮助你了解一周内的趋势和重要事项。",
+                cardCount: 7,
+                positions: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+            },
+            "monthly": {
+                name: "月运势",
+                description: "月运势牌阵预测未来一个月的每周运势及整体概况，帮助你把握月度趋势和重要事项。",
+                cardCount: 5,
+                positions: ["1.月度第1周", "2.月度第2周", "3.月度第3周", "4.月度第4周", "5.整月概览"]
+            },
+            "yearly": {
+                name: "新年12月运",
+                description: "新年12月运牌阵展望新一年的每月运势，揭示每个月的主要趋势、挑战和机遇，帮助你把握全年的整体发展。",
+                cardCount: 12,
+                positions: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+            }
+        };
+
+        // 当前选择的牌阵
+        let currentSpread = null;
+        // 已抽取的牌
+        let drawnCards = [];
+
+        // DOM元素
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const spreadCards = document.querySelectorAll('.spread-card');
+        const spreadFilters = document.querySelectorAll('.spread-filter');
+        const readingArea = document.getElementById('reading-area');
+        const spreadsSection = document.getElementById('spreads');
+        const spreadTitle = document.getElementById('spread-title');
+        const spreadDescription = document.getElementById('spread-description');
+        const spreadContainer = document.getElementById('spread-container');
+        const drawCardsBtn = document.getElementById('draw-cards');
+        const restartReadingBtn = document.getElementById('restart-reading');
+        const backToTopBtn = document.getElementById('back-to-top');
+        const cardMeaning = document.getElementById('card-meaning');
+        const meaningCardName = document.getElementById('meaning-card-name');
+        const meaningCardOrientation = document.getElementById('meaning-card-orientation');
+        const meaningDescription = document.getElementById('meaning-description');
+
+        // 移动端菜单切换
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // 隐藏占卜区域，显示目标区域
+                    if (targetId === '#spreads') {
+                        readingArea.classList.add('hidden');
+                        spreadsSection.classList.remove('hidden');
+                    } else if (targetId === '#home') {
+                        readingArea.classList.add('hidden');
+                        spreadsSection.classList.remove('hidden');
+                    }
+                    
+                    // 关闭移动菜单
+                    mobileMenu.classList.add('hidden');
+                    
+                    // 滚动到目标位置
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 牌阵筛选
+        spreadFilters.forEach(filter => {
+            filter.addEventListener('click', () => {
+                // 更新活跃状态
+                spreadFilters.forEach(f => f.classList.remove('active', 'bg-primary/40'));
+                filter.classList.add('active', 'bg-primary/40');
+                
+                const category = filter.getAttribute('data-filter');
+                
+                // 筛选牌阵
+                spreadCards.forEach(card => {
+                    if (category === 'all' || card.getAttribute('data-category') === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 选择牌阵
+        document.querySelectorAll('.start-reading').forEach(button => {
+            button.addEventListener('click', () => {
+                const spreadId = button.getAttribute('data-spread');
+                currentSpread = spreads[spreadId];
+                
+                // 更新占卜区域
+                spreadTitle.textContent = currentSpread.name;
+                spreadDescription.textContent = currentSpread.description;
+                
+                // 重置牌阵容器
+                spreadContainer.innerHTML = '<div class="text-light/50 text-center"><i class="fa fa-hand-o-down text-3xl mb-4 block animate-bounce"></i> 请专注于你的问题，然后点击抽牌按钮</div>';
+                cardMeaning.classList.add('hidden');
+                
+                // 显示占卜区域，隐藏牌阵选择区域
+                spreadsSection.classList.add('hidden');
+                readingArea.classList.remove('hidden');
+                
+                // 滚动到占卜区域
+                readingArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // 重置已抽的牌
+                drawnCards = [];
+            });
+        });
+
+        // 重新占卜
+        restartReadingBtn.addEventListener('click', () => {
+            // 显示牌阵选择区域，隐藏占卜区域
+            readingArea.classList.add('hidden');
+            spreadsSection.classList.remove('hidden');
+            
+            // 滚动到牌阵选择区域
+            spreadsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // 抽牌功能
+        drawCardsBtn.addEventListener('click', () => {
+            if (!currentSpread) return;
+            
+            // 禁用按钮
+            drawCardsBtn.disabled = true;
+            drawCardsBtn.innerHTML = '<i class="fa fa-circle-o-notch fa-spin mr-2"></i> 抽牌中...';
+            
+            // 清空容器
+            spreadContainer.innerHTML = '';
+            
+            // 随机抽牌
+            drawnCards = [];
+            const availableCards = [...tarotCards];
+            
+            for (let i = 0; i < currentSpread.cardCount; i++) {
+                // 随机选择一张牌
+                const randomIndex = Math.floor(Math.random() * availableCards.length);
+                const selectedCard = availableCards.splice(randomIndex, 1)[0];
+                
+                // 随机决定正逆位
+                const isUpright = Math.random() > 0.3; // 70% 正位，30% 逆位
+                
+                drawnCards.push({
+                    ...selectedCard,
+                    isUpright,
+                    position: currentSpread.positions[i]
+                });
+            }
+            
+            // 延迟显示牌，创造抽牌动画效果
+            setTimeout(() => {
+                // 移除所有布局类
+                spreadContainer.classList.remove('spread-row', 'spread-grid', 'flex', 'grid', 'flex-col', 'flex-wrap', 'year-spread-container', 'pyramid-spread', 'cross-spread', 'two-choices-spread', 'week-spread-container', 'three-row-layout');
+                
+                // 根据不同牌阵布局显示牌，确保完整展示所有行
+                if (currentSpread.cardCount === 1) {
+                    // 单张牌布局 - 居中显示
+                    spreadContainer.classList.add('flex', 'justify-center', 'py-2');
+                    spreadContainer.innerHTML = createCardElement(drawnCards[0], 0);
+                } 
+                // 3张牌布局 - 特别优化确保完整显示
+                else if (currentSpread.cardCount === 3) {
+                    // 使用专门的三行布局类
+                    spreadContainer.classList.add('three-row-layout');
+                    
+                    // 创建一行显示3张牌
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    drawnCards.forEach((card, index) => {
+                        row.innerHTML += createCardElement(card, index);
+                    });
+                    spreadContainer.appendChild(row);
+                }
+                // 4张牌布局
+                else if (currentSpread.cardCount === 4) {
+                    if (currentSpread.name === "恋人金字塔") {
+                        // 恋人金字塔优化：增加顶部空间
+                        spreadContainer.classList.add('pyramid-spread');
+                        // 顶层 - 第一张牌
+                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0, 'pyramid-top');
+                        // 中层
+                        const middleRow = document.createElement('div');
+                        middleRow.className = 'flex gap-2';
+                        middleRow.innerHTML += createCardElement(drawnCards[1], 1);
+                        middleRow.innerHTML += createCardElement(drawnCards[2], 2);
+                        spreadContainer.appendChild(middleRow);
+                        // 底层
+                        spreadContainer.innerHTML += createCardElement(drawnCards[3], 3);
+                    } else {
+                        // 普通4张牌水平布局
+                        spreadContainer.classList.add('spread-row');
+                        drawnCards.forEach((card, index) => {
+                            spreadContainer.innerHTML += createCardElement(card, index);
+                        });
+                    }
+                }
+                // 5张牌布局
+                else if (currentSpread.cardCount === 5) {
+                    if (currentSpread.name === "爱情大十字") {
+                        // 爱情大十字优化
+                        spreadContainer.classList.add('cross-spread');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0, 'cross-top');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[1], 1, 'cross-left');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[2], 2, 'cross-center');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[3], 3, 'cross-right');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[4], 4, 'cross-bottom');
+                    } else if (currentSpread.name === "月运势") {
+                        // 月运布局：4周+1概览
+                        spreadContainer.classList.add('flex', 'flex-wrap', 'justify-center', 'gap-1', 'py-2');
+                        // 前4张水平排列（周运势）
+                        for (let i = 0; i < 4; i++) {
+                            spreadContainer.innerHTML += createCardElement(drawnCards[i], i);
+                        }
+                        // 第5张（月概览）单独一行居中
+                        const overviewRow = document.createElement('div');
+                        overviewRow.className = 'w-full flex justify-center mt-2';
+                        overviewRow.innerHTML += createCardElement(drawnCards[4], 4);
+                        spreadContainer.appendChild(overviewRow);
+                    } else if (currentSpread.name === "二选一") {
+                        // 二选一布局
+                        spreadContainer.classList.add('two-choices-spread', 'py-2');
+                        
+                        // 第一行：你的真实需求
+                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0);
+                        
+                        // 第二行：两个选择的布局
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'two-choices-options';
+                        
+                        // 左侧：选择A的发展和结果
+                        const columnA = document.createElement('div');
+                        columnA.className = 'two-choices-column';
+                        columnA.innerHTML += createCardElement(drawnCards[1], 1); // 选择A的发展
+                        columnA.innerHTML += createCardElement(drawnCards[2], 2); // 选择A的结果
+                        optionsContainer.appendChild(columnA);
+                        
+                        // 右侧：选择B的发展和结果
+                        const columnB = document.createElement('div');
+                        columnB.className = 'two-choices-column';
+                        columnB.innerHTML += createCardElement(drawnCards[3], 3); // 选择B的发展
+                        columnB.innerHTML += createCardElement(drawnCards[4], 4); // 选择B的结果
+                        optionsContainer.appendChild(columnB);
+                        
+                        spreadContainer.appendChild(optionsContainer);
+                    } else {
+                        // 普通5张牌使用2行布局（2+3）
+                        spreadContainer.classList.add('flex', 'flex-col', 'items-center', 'gap-1', 'py-2');
+                        const row1 = document.createElement('div');
+                        row1.className = 'flex gap-1';
+                        row1.innerHTML += createCardElement(drawnCards[0], 0);
+                        row1.innerHTML += createCardElement(drawnCards[1], 1);
+                        spreadContainer.appendChild(row1);
+                        
+                        const row2 = document.createElement('div');
+                        row2.className = 'flex gap-1';
+                        row2.innerHTML += createCardElement(drawnCards[2], 2);
+                        row2.innerHTML += createCardElement(drawnCards[3], 3);
+                        row2.innerHTML += createCardElement(drawnCards[4], 4);
+                        spreadContainer.appendChild(row2);
+                    }
+                }
+                // 6张牌布局 - 事业金字塔
+                else if (currentSpread.cardCount === 6) {
+                    // 金字塔形排列（1+2+3）
+                    spreadContainer.classList.add('pyramid-spread');
+                    
+                    // 顶层
+                    spreadContainer.innerHTML += createCardElement(drawnCards[0], 0);
+                    
+                    // 中层
+                    const middleRow = document.createElement('div');
+                    middleRow.className = 'flex gap-1';
+                    middleRow.innerHTML += createCardElement(drawnCards[1], 1);
+                    middleRow.innerHTML += createCardElement(drawnCards[2], 2);
+                    spreadContainer.appendChild(middleRow);
+                    
+                    // 底层
+                    const bottomRow = document.createElement('div');
+                    bottomRow.className = 'flex gap-1';
+                    bottomRow.innerHTML += createCardElement(drawnCards[3], 3);
+                    bottomRow.innerHTML += createCardElement(drawnCards[4], 4);
+                    bottomRow.innerHTML += createCardElement(drawnCards[5], 5);
+                    spreadContainer.appendChild(bottomRow);
+                }
+                // 7张牌布局
+                else if (currentSpread.cardCount === 7) {
+                    if (currentSpread.name === "三选一") {
+                        // 三选一优化
+                        spreadContainer.classList.add('flex', 'flex-col', 'items-center', 'gap-2', 'py-2');
+                        
+                        // 第1张（真实需求）
+                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0);
+                        
+                        // 中间行：3个选择的发展
+                        const middleRow = document.createElement('div');
+                        middleRow.className = 'flex flex-wrap justify-center gap-1 w-full';
+                        for (let i = 1; i < 4; i++) {
+                            middleRow.innerHTML += createCardElement(drawnCards[i], i);
+                        }
+                        spreadContainer.appendChild(middleRow);
+                        
+                        // 底行：3个选择的结果
+                        const bottomRow = document.createElement('div');
+                        bottomRow.className = 'flex flex-wrap justify-center gap-1 w-full';
+                        for (let i = 4; i < 7; i++) {
+                            bottomRow.innerHTML += createCardElement(drawnCards[i], i);
+                        }
+                        spreadContainer.appendChild(bottomRow);
+                    } else if (currentSpread.name === "周运势") {
+                        // 周运布局：3+4两排排列
+                        spreadContainer.classList.add('week-spread-container');
+                        
+                        // 第一行：周一、周二、周三
+                        const row1 = document.createElement('div');
+                        row1.className = 'week-spread-row';
+                        for (let i = 0; i < 3; i++) {
+                            row1.innerHTML += createCardElement(drawnCards[i], i);
+                        }
+                        spreadContainer.appendChild(row1);
+                        
+                        // 第二行：周四、周五、周六、周日
+                        const row2 = document.createElement('div');
+                        row2.className = 'week-spread-row';
+                        for (let i = 3; i < 7; i++) {
+                            row2.innerHTML += createCardElement(drawnCards[i], i);
+                        }
+                        spreadContainer.appendChild(row2);
+                    }
+                }
+                // 12张牌布局（新年12月运）
+                else if (currentSpread.cardCount === 12) {
+                    spreadContainer.classList.add('year-spread-container', 'py-2');
+                    
+                    // 第一行：1-6月
+                    const row1 = document.createElement('div');
+                    row1.className = 'year-spread-row';
+                    for (let i = 0; i < 6; i++) {
+                        row1.innerHTML += createCardElement(drawnCards[i], i);
+                    }
+                    spreadContainer.appendChild(row1);
+                    
+                    // 第二行：7-12月
+                    const row2 = document.createElement('div');
+                    row2.className = 'year-spread-row';
+                    for (let i = 6; i < 12; i++) {
+                        row2.innerHTML += createCardElement(drawnCards[i], i);
+                    }
+                    spreadContainer.appendChild(row2);
+                }
+                
+                // 启用按钮
+                drawCardsBtn.disabled = false;
+                drawCardsBtn.innerHTML = '<i class="fa fa-random mr-2"></i> 重新抽牌';
+                
+                // 添加翻牌动画
+                setTimeout(() => {
+                    document.querySelectorAll('.tarot-card').forEach(card => {
+                        card.classList.add('card-flip-active');
+                    });
+                }, 500);
+                
+                // 显示第一张牌的解释
+                if (drawnCards.length > 0) {
+                    showCardMeaning(drawnCards[0]);
+                }
+                
+                // 强制重绘以确保所有内容正确显示
+                setTimeout(() => {
+                    spreadContainer.style.display = 'none';
+                    spreadContainer.offsetHeight; // 触发重绘
+                    spreadContainer.style.display = '';
+                }, 100);
+                
+            }, 1000);
+        });
+
+        // 创建牌元素
+        function createCardElement(card, index, customClass = '') {
+            const orientationText = card.isUpright ? '正位' : '逆位';
+            const additionalClass = customClass ? ` ${customClass}` : '';
+            
+            return `
+                <div class="tarot-card-wrapper${additionalClass}" data-index="${index}">
+                    <div class="tarot-card card-flip relative cursor-pointer mx-auto">
+                        <!-- 牌背 -->
+                        <div class="card-front absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-lg shadow-lg flex items-center justify-center">
+                            <i class="fa fa-moon-o text-4xl text-light/80"></i>
+                        </div>
+                        <!-- 牌面 -->
+                        <div class="card-back absolute inset-0">
+                            <img src="${card.isUpright ? card.upright : card.reversed}" alt="${card.name}(${orientationText})" class="w-full h-full object-cover rounded-lg shadow-lg border border-light/10">
+                            <div class="absolute bottom-0 left-0 right-0 bg-dark/70 backdrop-blur text-center py-0.5 text-xs truncate">
+                                ${card.position}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 牌信息区域 -->
+                    <div class="card-info">
+                        <h4 class="font-medium text-xs whitespace-nowrap overflow-hidden text-ellipsis">${card.name}</h4>
+                        <p class="text-[10px] text-light/60">${orientationText}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 显示牌义解释
+        function showCardMeaning(card) {
+            meaningCardName.textContent = card.name;
+            meaningCardOrientation.textContent = card.isUpright ? '正位' : '逆位';
+            meaningDescription.textContent = card.meaning;
+            cardMeaning.classList.remove('hidden');
+            
+            // 滚动到解释区域
+            cardMeaning.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // 点击牌显示解释
+        spreadContainer.addEventListener('click', (e) => {
+            const cardContainer = e.target.closest('.tarot-card-wrapper');
+            if (cardContainer) {
+                const index = parseInt(cardContainer.getAttribute('data-index'));
+                if (drawnCards[index]) {
+                    showCardMeaning(drawnCards[index]);
+                }
+            }
+        });
+
+        // 回到顶部按钮
+        function updateBackToTopButton() {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+            }
+        }
+
+        // 监听滚动事件更新按钮状态
+        window.addEventListener('scroll', updateBackToTopButton);
+        
+        // 初始化按钮状态
+        updateBackToTopButton();
+        
+        // 回到顶部功能
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.classList.add('py-2');
+                header.classList.remove('py-4');
+            } else {
+                header.classList.add('py-4');
+                header.classList.remove('py-2');
+            }
+        });
+    </script>
+</body>
+</html>
