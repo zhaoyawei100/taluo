@@ -854,7 +854,7 @@
                 const selectedCard = availableCards.splice(randomIndex, 1)[0];
                 
                 // 随机决定正逆位
-                const isUpright = Math.random() > 0.3; // 70% 正位，30% 逆位
+                const isUpright = Math.random() > 0.5; // 50% 正位，50% 逆位
                 
                 drawnCards.push({
                     ...selectedCard,
