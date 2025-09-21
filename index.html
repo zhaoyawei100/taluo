@@ -195,6 +195,14 @@
                 position: relative;
                 overflow: hidden;
             }
+            /* 提示文字和图标的容器样式 */
+            .prompt-container {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
         }
     </style>
 </head>
@@ -472,9 +480,9 @@
                 <!-- 牌阵展示区 - 确保完整展示所有行 -->
                 <div id="spread-container" class="spread-container min-h-[150px] mb-10 max-w-7xl mx-auto">
                     <!-- 牌阵将在这里动态生成 -->
-                    <div class="text-light/50 text-center">
-                        <i class="fa fa-hand-o-down text-3xl mb-4 block animate-bounce"></i>
-                        选择牌阵并点击抽牌按钮开始
+                    <div class="prompt-container">
+                        <i class="fa fa-hand-o-up text-3xl mb-4 block animate-bounce"></i>
+                        <p class="text-light/50 text-center">请静心10秒钟专注于思考你的问题，然后点击抽牌按钮</p>
                     </div>
                 </div>
                 
@@ -537,7 +545,7 @@
                 <div class="flex flex-col md:flex-row items-center justify-center gap-12">
                     <div class="bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 w-full max-w-sm text-center">
                         <div class="mb-4">
-                            <img src="https://raw.githubusercontent.com/zhaoyawei100/taluo/refs/heads/main/erweima.webp" alt="微信二维码" class="w-64 h-64 mx-auto rounded-lg border-4 border-primary/30">
+                            <img src="https://raw.githubusercontent.com/zhaoyawei100/taluo/refs/heads/main/erweima.jpg" alt="微信二维码" class="w-64 h-64 mx-auto rounded-lg border-4 border-primary/30">
                         </div>
                         <h3 class="text-xl font-bold mb-2">微信扫码联系</h3>
                         <p class="text-light/70">添加时请注明"塔罗解牌"</p>
@@ -607,29 +615,95 @@
     </button>
 
     <script>
-        // 塔罗牌数据
+        // 完整的78张塔罗牌数据
         const tarotCards = [
-            { name: "愚人", upright: "https://w.taluo.com/pa/yrz.jpg", reversed: "https://w.taluo.com/pa/yrn.jpg", meaning: "愚人代表着新的开始、冒险和自由。正位时，它鼓励你拥抱未知，跟随直觉勇敢前行。这张牌象征着天真、 spontaneity 和对生活的热情。" },
-            { name: "魔术师", upright: "https://w.taluo.com/pa/mfsz.jpg", reversed: "https://w.taluo.com/pa/mfsn.jpg", meaning: "魔术师代表着创造力、行动力和资源的掌握。正位时，它显示你拥有实现目标所需的全部能力和资源，只需集中精力和意志即可成功。" },
-            { name: "女祭司", upright: "https://w.taluo.com/pa/njsz.jpg", reversed: "https://w.taluo.com/pa/njsn.jpg", meaning: "女祭司象征着直觉、神秘和内在智慧。正位时，它鼓励你相信自己的直觉，探索潜意识的深处，寻找答案。这张牌也代表着保密和谨慎。" },
-            { name: "女皇", upright: "https://w.taluo.com/pa/nhz.jpg", reversed: "https://w.taluo.com/pa/nhn.jpg", meaning: "女皇代表着丰饶、母性和创造力。正位时，它象征着繁荣、舒适和物质上的满足。这张牌鼓励你享受生活的美好，培养人际关系和创造力。" },
-            { name: "皇帝", upright: "https://w.taluo.com/pa/hdz.jpg", reversed: "https://w.taluo.com/pa/hdn.jpg", meaning: "皇帝象征着权威、结构和控制。正位时，它代表着领导力、自律和成功的管理能力。这张牌提醒你要为自己的生活负责，建立稳定的基础。" },
-            { name: "教皇", upright: "https://w.taluo.com/pa/jhz.jpg", reversed: "https://w.taluo.com/pa/jhn.jpg", meaning: "教皇代表着传统、灵性和指导。正位时，它象征着宗教信仰、道德价值观和社会规范。这张牌鼓励你寻求智慧和指导，尊重传统和权威。" },
-            { name: "恋人", upright: "https://w.taluo.com/pa/lrz.jpg", reversed: "https://w.taluo.com/pa/lrn.jpg", meaning: "恋人象征着爱情、选择和和谐。正位时，它代表着浪漫关系、重要的选择和价值观的 alignment。这张牌提醒你要做出基于内心真实感受的选择。" },
-            { name: "战车", upright: "https://w.taluo.com/pa/zcz.jpg", reversed: "https://w.taluo.com/pa/zcn.jpg", meaning: "战车代表着意志、控制和胜利。正位时，它象征着克服障碍的决心、自律和成功的动力。这张牌鼓励你集中精力，勇往直前。" },
-            { name: "力量", upright: "https://w.taluo.com/pa/llz.jpg", reversed: "https://w.taluo.com/pa/lln.jpg", meaning: "力量象征着内在力量、勇气和温柔。正位时，它代表着通过温柔而非暴力来克服挑战，展现真正的力量和同情心。" },
-            { name: "隐者", upright: "https://w.taluo.com/pa/ysz.jpg", reversed: "https://w.taluo.com/pa/ysn.jpg", meaning: "隐者代表着智慧、内省和孤独。正位时，它鼓励你花时间独处，反思生活，寻找内在的真理和智慧。这张牌象征着成熟和智慧的积累。" },
-            { name: "命运之轮", upright: "https://w.taluo.com/pa/myzlz.jpg", reversed: "https://w.taluo.com/pa/myzln.jpg", meaning: "命运之轮象征着变化、机遇和命运。正位时，它代表着生活中的转折点，好运的到来和自然的循环。这张牌提醒你接受变化是生活的一部分。" },
-            { name: "正义", upright: "https://w.taluo.com/pa/zyz.jpg", reversed: "https://w.taluo.com/pa/zyn.jpg", meaning: "正义代表着公平、平衡和责任。正位时，它象征着公正的对待，因果报应和道德的选择。这张牌提醒你要为自己的行为负责，保持平衡。" },
-            { name: "倒吊人", upright: "https://w.taluo.com/pa/ddrz.jpg", reversed: "https://w.taluo.com/pa/ddrn.jpg", meaning: "倒吊人象征着牺牲、等待和新的视角。正位时，它代表着自愿的牺牲，耐心等待和从不同角度看待问题的能力。这张牌鼓励你放下控制，接受现状。" },
-            { name: "节制", upright: "https://w.taluo.com/pa/jzz.jpg", reversed: "https://w.taluo.com/pa/jzn.jpg", meaning: "节制代表着平衡、和谐和适度。正位时，它象征着情绪的平衡，健康的生活方式和资源的合理使用。这张牌鼓励你在生活的各个方面寻找平衡。" },
-            { name: "恶魔", upright: "https://w.taluo.com/pa/emz.jpg", reversed: "https://w.taluo.com/pa/emn.jpg", meaning: "恶魔象征着诱惑、束缚和物质主义。正位时，它代表着被欲望、恐惧或坏习惯所束缚，无法自由行动。这张牌提醒你要认清自己的限制，寻找解脱的方法。" },
-            { name: "高塔", upright: "https://w.taluo.com/pa/gtz.jpg", reversed: "https://w.taluo.com/pa/gtn.jpg", meaning: "高塔代表着突然的变化、混乱和解放。正位时，它象征着旧有结构的崩溃，突如其来的变故和必要的破坏。这张牌提醒你要接受变化，即使它带来痛苦。" },
-            { name: "星星", upright: "https://w.taluo.com/pa/xxz.jpg", reversed: "https://w.taluo.com/pa/xxn.jpg", meaning: "星星象征着希望、灵感和灵性。正位时，它代表着乐观、梦想的实现和精神上的指引。这张牌鼓励你保持希望，追随自己的梦想。" },
-            { name: "月亮", upright: "https://w.taluo.com/pa/ylz.jpg", reversed: "https://w.taluo.com/pa/yln.jpg", meaning: "月亮代表着不确定性、恐惧和潜意识。正位时，它象征着迷茫、焦虑和隐藏的恐惧。这张牌提醒你要面对自己的恐惧，寻找真相。" },
-            { name: "太阳", upright: "https://w.taluo.com/pa/tyz.jpg", reversed: "https://w.taluo.com/pa/tyn.jpg", meaning: "太阳象征着快乐、成功和活力。正位时，它代表着幸福、成就和积极的能量。这张牌带来光明和温暖，预示着成功和满足。" },
-            { name: "审判", upright: "https://w.taluo.com/pa/spz.jpg", reversed: "https://w.taluo.com/pa/spn.jpg", meaning: "审判代表着重生、觉醒和评估。正位时，它象征着自我反省，重大的决定和新的开始。这张牌鼓励你面对自己的过去，做出必要的改变。" },
-            { name: "世界", upright: "https://w.taluo.com/pa/sjz.jpg", reversed: "https://w.taluo.com/pa/sjn.jpg", meaning: "世界象征着完成、圆满和旅行。正位时，它代表着一个阶段的结束，成功的完成和满足感。这张牌预示着新的冒险和机会即将到来。" }
+            // 大阿卡那
+            { name: "愚人", upright: "https://w.taluo.com/pa/yrz.jpg", reversed: "https://w.taluo.com/pa/yrn.jpg", meaning: "愚人代表着新的开始、冒险和自由。正位时，它鼓励你拥抱未知，跟随直觉勇敢前行。这张牌象征着天真、自发性和对生活的热情。逆位则可能表示鲁莽、缺乏准备或无视警告。" },
+            { name: "魔术师", upright: "https://w.taluo.com/pa/mfsz.jpg", reversed: "https://w.taluo.com/pa/mfsn.jpg", meaning: "魔术师代表着创造力、行动力和资源的掌握。正位时，它显示你拥有实现目标所需的全部能力和资源，只需集中精力和意志即可成功。逆位可能意味着缺乏自信、能力未被充分利用或操纵他人。" },
+            { name: "女祭司", upright: "https://w.taluo.com/pa/njsz.jpg", reversed: "https://w.taluo.com/pa/njsn.jpg", meaning: "女祭司象征着直觉、神秘和内在智慧。正位时，它鼓励你相信自己的直觉，探索潜意识的深处，寻找答案。这张牌也代表着保密和谨慎。逆位可能表示忽略直觉、 Secrets被揭露或过度多疑。" },
+            { name: "女皇", upright: "https://w.taluo.com/pa/nhz.jpg", reversed: "https://w.taluo.com/pa/nhn.jpg", meaning: "女皇代表着丰饶、母性和创造力。正位时，它象征着繁荣、舒适和物质上的满足。这张牌鼓励你享受生活的美好，培养人际关系和创造力。逆位可能表示缺乏自信、创造力受阻或过度放纵。" },
+            { name: "皇帝", upright: "https://w.taluo.com/pa/hdz.jpg", reversed: "https://w.taluo.com/pa/hdn.jpg", meaning: "皇帝象征着权威、结构和控制。正位时，它代表着领导力、自律和成功的管理能力。这张牌提醒你要为自己的生活负责，建立稳定的基础。逆位可能意味着滥用权力、缺乏自律或权威受到挑战。" },
+            { name: "教皇", upright: "https://w.taluo.com/pa/jhz.jpg", reversed: "https://w.taluo.com/pa/jhn.jpg", meaning: "教皇代表着传统、灵性和指导。正位时，它象征着宗教信仰、道德价值观和社会规范。这张牌鼓励你寻求智慧和指导，尊重传统和权威。逆位可能表示打破传统、质疑权威或盲目跟从。" },
+            { name: "恋人", upright: "https://w.taluo.com/pa/lrz.jpg", reversed: "https://w.taluo.com/pa/lrn.jpg", meaning: "恋人象征着爱情、选择和和谐。正位时，它代表着浪漫关系、重要的选择和价值观的一致。这张牌提醒你要做出基于内心真实感受的选择。逆位可能表示关系出现问题、选择困难或价值观冲突。" },
+            { name: "战车", upright: "https://w.taluo.com/pa/zcz.jpg", reversed: "https://w.taluo.com/pa/zcn.jpg", meaning: "战车代表着意志、控制和胜利。正位时，它象征着克服障碍的决心、自律和成功的动力。这张牌鼓励你集中精力，勇往直前。逆位可能意味着缺乏方向、失去控制或冲突未解决。" },
+            { name: "力量", upright: "https://w.taluo.com/pa/llz.jpg", reversed: "https://w.taluo.com/pa/lln.jpg", meaning: "力量象征着内在力量、勇气和温柔。正位时，它代表着通过温柔而非暴力来克服挑战，展现真正的力量和同情心。逆位可能表示缺乏勇气、力量被滥用或内在力量未被发现。" },
+            { name: "隐者", upright: "https://w.taluo.com/pa/ysz.jpg", reversed: "https://w.taluo.com/pa/ysn.jpg", meaning: "隐者代表着智慧、内省和孤独。正位时，它鼓励你花时间独处，反思生活，寻找内在的真理和智慧。这张牌象征着成熟和智慧的积累。逆位可能表示过度孤立、缺乏自我反思或逃避现实。" },
+            { name: "命运之轮", upright: "https://w.taluo.com/pa/myzlz.jpg", reversed: "https://w.taluo.com/pa/myzln.jpg", meaning: "命运之轮象征着变化、机遇和命运。正位时，它代表着生活中的转折点，好运的到来和自然的循环。这张牌提醒你接受变化是生活的一部分。逆位可能意味着阻力变化、错过机会或经历困难时期。" },
+            { name: "正义", upright: "https://w.taluo.com/pa/zyz.jpg", reversed: "https://w.taluo.com/pa/zyn.jpg", meaning: "正义代表着公平、平衡和责任。正位时，它象征着公正的对待，因果报应和道德的选择。这张牌提醒你要为自己的行为负责，保持平衡。逆位可能表示不公、偏见或不负责任。" },
+            { name: "死神", upright: "https://w.taluo.com/pa/ssz.jpg", reversed: "https://w.taluo.com/pa/ssn.jpg", meaning: "死神象征着终结、转变和重生。正位时，它代表着某个阶段的结束，必要的改变和新的开始。这张牌提醒你接受不可避免的变化。逆位可能意味着抗拒变化、恐惧结束或无法放下过去。" },
+            { name: "倒吊人", upright: "https://w.taluo.com/pa/ddrz.jpg", reversed: "https://w.taluo.com/pa/ddrn.jpg", meaning: "倒吊人象征着牺牲、等待和新的视角。正位时，它代表着自愿的牺牲，耐心等待和从不同角度看待问题的能力。这张牌鼓励你放下控制，接受现状。逆位可能表示不情愿的牺牲、徒劳的等待或缺乏洞察力。" },
+            { name: "节制", upright: "https://w.taluo.com/pa/jzz.jpg", reversed: "https://w.taluo.com/pa/jzn.jpg", meaning: "节制代表着平衡、和谐和适度。正位时，它象征着情绪的平衡，健康的生活方式和资源的合理使用。这张牌鼓励你在生活的各个方面寻找平衡。逆位可能意味着失衡、过度或缺乏自我控制。" },
+            { name: "恶魔", upright: "https://w.taluo.com/pa/emz.jpg", reversed: "https://w.taluo.com/pa/emn.jpg", meaning: "恶魔象征着诱惑、束缚和物质主义。正位时，它代表着被欲望、恐惧或坏习惯所束缚，无法自由行动。这张牌提醒你要认清自己的限制，寻找解脱的方法。逆位可能表示摆脱束缚、克服诱惑或打破坏习惯。" },
+            { name: "高塔", upright: "https://w.taluo.com/pa/gtz.jpg", reversed: "https://w.taluo.com/pa/gtn.jpg", meaning: "高塔代表着突然的变化、混乱和解放。正位时，它象征着旧有结构的崩溃，突如其来的变故和必要的破坏。这张牌提醒你要接受变化，即使它带来痛苦。逆位可能意味着抗拒变化、延迟的灾难或避免的危机。" },
+            { name: "星星", upright: "https://w.taluo.com/pa/xxz.jpg", reversed: "https://w.taluo.com/pa/xxn.jpg", meaning: "星星象征着希望、灵感和灵性。正位时，它代表着乐观、梦想的实现和精神上的指引。这张牌鼓励你保持希望，追随自己的梦想。逆位可能意味着失去希望、缺乏灵感或灵性成长受阻。" },
+            { name: "月亮", upright: "https://w.taluo.com/pa/ylz.jpg", reversed: "https://w.taluo.com/pa/yln.jpg", meaning: "月亮代表着不确定性、恐惧和潜意识。正位时，它象征着迷茫、焦虑和隐藏的恐惧。这张牌提醒你要面对自己的恐惧，寻找真相。逆位可能表示克服恐惧、看清真相或结束不确定性。" },
+            { name: "太阳", upright: "https://w.taluo.com/pa/tyz.jpg", reversed: "https://w.taluo.com/pa/tyn.jpg", meaning: "太阳象征着快乐、成功和活力。正位时，它代表着幸福、成就和积极的能量。这张牌带来光明和温暖，预示着成功和满足。逆位可能意味着缺乏自信、成功受阻或情绪低落。" },
+            { name: "审判", upright: "https://w.taluo.com/pa/spz.jpg", reversed: "https://w.taluo.com/pa/spn.jpg", meaning: "审判代表着重生、觉醒和评估。正位时，它象征着自我反省，重大的决定和新的开始。这张牌鼓励你面对自己的过去，做出必要的改变。逆位可能意味着拒绝改变、缺乏自我反省或错误的判断。" },
+            { name: "世界", upright: "https://w.taluo.com/pa/sjz.jpg", reversed: "https://w.taluo.com/pa/sjn.jpg", meaning: "世界象征着完成、圆满和旅行。正位时，它代表着一个阶段的结束，成功的完成和满足感。这张牌预示着新的冒险和机会即将到来。逆位可能意味着未完成、缺乏 closure 或抗拒新的开始。" },
+            
+            // 权杖系列
+            { name: "权杖1", upright: "https://w.taluo.com/pa/qz1z.jpg", reversed: "https://w.taluo.com/pa/qz1n.jpg", meaning: "权杖1代表新的开始、创造力和行动力。正位时，它象征着新的机会和冒险的开始，充满活力和热情。逆位可能表示错失机会或行动力受阻。" },
+            { name: "权杖2", upright: "https://w.taluo.com/pa/qz2z.jpg", reversed: "https://w.taluo.com/pa/qz2n.jpg", meaning: "权杖2象征着计划、决策和平衡。正位时，它代表着深思熟虑后的决定和对未来的规划。逆位可能表示犹豫不决或计划受阻。" },
+            { name: "权杖3", upright: "https://w.taluo.com/pa/qz3z.jpg", reversed: "https://w.taluo.com/pa/qz3n.jpg", meaning: "权杖3代表远见、扩张和探索。正位时，它象征着对未来的展望和准备采取行动的决心。逆位可能表示缺乏远见或计划不周。" },
+            { name: "权杖4", upright: "https://w.taluo.com/pa/qz4z.jpg", reversed: "https://w.taluo.com/pa/qz4n.jpg", meaning: "权杖4象征着稳定、和谐和庆祝。正位时，它代表着家庭的稳定、事业的成就或关系的和谐。逆位可能表示不稳定或关系出现问题。" },
+            { name: "权杖5", upright: "https://w.taluo.com/pa/qz5z.jpg", reversed: "https://w.taluo.com/pa/qz5n.jpg", meaning: "权杖5代表冲突、竞争和挑战。正位时，它象征着生活中的冲突和竞争，需要勇气和决心去面对。逆位可能表示避免冲突或解决争端。" },
+            { name: "权杖6", upright: "https://w.taluo.com/pa/qz6z.jpg", reversed: "https://w.taluo.com/pa/qz6n.jpg", meaning: "权杖6象征着胜利、成功和认可。正位时，它代表着通过努力获得的成功和他人的认可。逆位可能表示自满、虚假的胜利或成功短暂。" },
+            { name: "权杖7", upright: "https://w.taluo.com/pa/qz7z.jpg", reversed: "https://w.taluo.com/pa/qz7n.jpg", meaning: "权杖7代表坚持、防御和勇气。正位时，它象征着面对挑战时的坚持和勇气，不轻易放弃。逆位可能表示放弃、缺乏勇气或过度防御。" },
+            { name: "权杖8", upright: "https://w.taluo.com/pa/qz8z.jpg", reversed: "https://w.taluo.com/pa/qz8n.jpg", meaning: "权杖8象征着行动、速度和进展。正位时，它代表着事情快速进展，行动果断有效。逆位可能表示延迟、行动受阻或进展缓慢。" },
+            { name: "权杖9", upright: "https://w.taluo.com/pa/qz9z.jpg", reversed: "https://w.taluo.com/pa/qz9n.jpg", meaning: "权杖9代表警惕、防御和韧性。正位时，它象征着经历挑战后的警惕和准备，以及内在的韧性。逆位可能表示过度警惕、恐惧或缺乏安全感。" },
+            { name: "权杖10", upright: "https://w.taluo.com/pa/qz10z.jpg", reversed: "https://w.taluo.com/pa/qz10n.jpg", meaning: "权杖10象征着负担、责任和压力。正位时，它代表着承担过多的责任和压力，需要学会放下。逆位可能表示卸下负担、分配责任或逃避责任。" },
+            { name: "权杖侍从", upright: "https://w.taluo.com/pa/qzscz.jpg", reversed: "https://w.taluo.com/pa/qzscn.jpg", meaning: "权杖侍从代表热情、好奇心和新的想法。正位时，它象征着对新事物的热情和好奇心，以及探索新想法的勇气。逆位可能表示冲动、缺乏方向或热情过度。" },
+            { name: "权杖骑士", upright: "https://w.taluo.com/pa/qzqsz.jpg", reversed: "https://w.taluo.com/pa/qzqsn.jpg", meaning: "权杖骑士象征着行动、冒险和热情。正位时，它代表着充满热情地追求目标，行动迅速果断。逆位可能表示冲动、鲁莽或缺乏耐心。" },
+            { name: "权杖王后", upright: "https://w.taluo.com/pa/qzhhz.jpg", reversed: "https://w.taluo.com/pa/qzhhn.jpg", meaning: "权杖王后代表创造力、热情和自信。正位时，它象征着充满创造力和热情的女性形象，自信而有魅力。逆位可能表示情绪化、缺乏自信或创造力受阻。" },
+            { name: "权杖国王", upright: "https://w.taluo.com/pa/qzgwz.jpg", reversed: "https://w.taluo.com/pa/qzgwn.jpg", meaning: "权杖国王象征着领导力、权威和行动力。正位时，它代表着有能力、有远见的领导者，能够果断行动并激励他人。逆位可能表示专横、滥用权力或缺乏领导力。" },
+            
+            // 圣杯系列
+            { name: "圣杯1", upright: "https://w.taluo.com/pa/sb1z.jpg", reversed: "https://w.taluo.com/pa/sb1n.jpg", meaning: "圣杯1代表新的情感、爱和灵感。正位时，它象征着新的感情开始、爱的到来或创意的灵感。逆位可能表示情感受阻、错失机会或爱的缺失。" },
+            { name: "圣杯2", upright: "https://w.taluo.com/pa/sb2z.jpg", reversed: "https://w.taluo.com/pa/sb2n.jpg", meaning: "圣杯2象征着合作、和谐和平衡的关系。正位时，它代表着平等互利的关系、良好的合作或情感的交流。逆位可能表示关系紧张、合作破裂或不平等的关系。" },
+            { name: "圣杯3", upright: "https://w.taluo.com/pa/sb3z.jpg", reversed: "https://w.taluo.com/pa/sb3n.jpg", meaning: "圣杯3代表庆祝、友谊和团体活动。正位时，它象征着与朋友和家人的欢乐时光、社交活动的成功或团队合作的喜悦。逆位可能表示社交困难、团体冲突或孤独感。" },
+            { name: "圣杯4", upright: "https://w.taluo.com/pa/sb4z.jpg", reversed: "https://w.taluo.com/pa/sb4n.jpg", meaning: "圣杯4象征着不满、冷漠和选择。正位时，它代表着对现状的不满、情感上的冷漠或对新机会的犹豫。逆位可能表示接受新机会、情感开放或克服不满。" },
+            { name: "圣杯5", upright: "https://w.taluo.com/pa/sb5z.jpg", reversed: "https://w.taluo.com/pa/sb5n.jpg", meaning: "圣杯5代表失落、悲伤和遗憾。正位时，它象征着失去的痛苦、情感的悲伤或对过去的遗憾。逆位可能表示接受损失、情绪恢复或向前看的能力。" },
+            { name: "圣杯6", upright: "https://w.taluo.com/pa/sb6z.jpg", reversed: "https://w.taluo.com/pa/sb6n.jpg", meaning: "圣杯6象征着给予、接受和互惠的关系。正位时，它代表着和谐的关系、互相帮助和情感的支持。逆位可能表示不平等的给予、情感依赖或忘恩负义。" },
+            { name: "圣杯7", upright: "https://w.taluo.com/pa/sb7z.jpg", reversed: "https://w.taluo.com/pa/sb7n.jpg", meaning: "圣杯7代表梦想、幻想和愿望。正位时，它象征着对未来的梦想和愿望，以及丰富的想象力。逆位可能表示不切实际的幻想、逃避现实或愿望无法实现。" },
+            { name: "圣杯8", upright: "https://w.taluo.com/pa/sb8z.jpg", reversed: "https://w.taluo.com/pa/sb8n.jpg", meaning: "圣杯8象征着放弃、寻找和转变。正位时，它代表着放弃不满意的状况，寻找更好的机会和情感的成长。逆位可能表示不愿放手、害怕改变或停滞不前。" },
+            { name: "圣杯9", upright: "https://w.taluo.com/pa/sb9z.jpg", reversed: "https://w.taluo.com/pa/sb9n.jpg", meaning: "圣杯9代表满足、幸福和自信。正位时，它象征着情感上的满足、内心的幸福和对自己的自信。逆位可能表示不满、缺乏自信或虚假的幸福。" },
+            { name: "圣杯10", upright: "https://w.taluo.com/pa/sb10z.jpg", reversed: "https://w.taluo.com/pa/sb10n.jpg", meaning: "圣杯10象征着家庭幸福、和谐和完美。正位时，它代表着家庭的幸福、关系的和谐和情感的圆满。逆位可能表示家庭冲突、关系不和谐或情感缺失。" },
+            { name: "圣杯侍从", upright: "https://w.taluo.com/pa/sbscz.jpg", reversed: "https://w.taluo.com/pa/sbscn.jpg", meaning: "圣杯侍从代表情感、敏感和创造力。正位时，它象征着情感丰富、敏感体贴和艺术创造力。逆位可能表示情感不成熟、敏感过度或创造力受阻。" },
+            { name: "圣杯骑士", upright: "https://w.taluo.com/pa/sbqsz.jpg", reversed: "https://w.taluo.com/pa/sbqsn.jpg", meaning: "圣杯骑士象征着浪漫、热情和体贴。正位时，它代表着浪漫的情怀、热情的追求和对他人的体贴。逆位可能表示情感不真诚、优柔寡断或过度情绪化。" },
+            { name: "圣杯王后", upright: "https://w.taluo.com/pa/sbhhz.jpg", reversed: "https://w.taluo.com/pa/sbhhn.jpg", meaning: "圣杯王后代表爱、同情和直觉。正位时，它象征着充满爱心、富有同情心和直觉敏锐的女性形象。逆位可能表示情感操纵、过度情绪化或缺乏同情心。" },
+            { name: "圣杯国王", upright: "https://w.taluo.com/pa/sbgwz.jpg", reversed: "https://w.taluo.com/pa/sbgwn.jpg", meaning: "圣杯国王象征着情感稳定、智慧和领导力。正位时，它代表着情感成熟、有智慧和善于处理人际关系的领导者。逆位可能表示情感冷漠、缺乏智慧或滥用情感权力。" },
+            
+            // 宝剑系列
+            { name: "宝剑1", upright: "https://w.taluo.com/pa/bj1z.jpg", reversed: "https://w.taluo.com/pa/bj1n.jpg", meaning: "宝剑1代表新的思想、清晰和突破。正位时，它象征着新的想法、清晰的思维和突破性的见解。逆位可能表示思想混乱、缺乏清晰或错误的判断。" },
+            { name: "宝剑2", upright: "https://w.taluo.com/pa/bj2z.jpg", reversed: "https://w.taluo.com/pa/bj2n.jpg", meaning: "宝剑2象征着决策、平衡和中立。正位时，它代表着需要做出艰难的决定，保持中立和平衡的观点。逆位可能表示犹豫不决、偏见或逃避决策。" },
+            { name: "宝剑3", upright: "https://w.taluo.com/pa/bj3z.jpg", reversed: "https://w.taluo.com/pa/bj3n.jpg", meaning: "宝剑3代表心痛、悲伤和失落。正位时，它象征着情感上的痛苦、心碎或失落的经历。逆位可能表示情感疗愈、走出悲伤或减轻痛苦。" },
+            { name: "宝剑4", upright: "https://w.taluo.com/pa/bj4z.jpg", reversed: "https://w.taluo.com/pa/bj4n.jpg", meaning: "宝剑4象征着休息、恢复和反思。正位时，它代表着需要休息和恢复精力，进行内省和反思。逆位可能表示休息不足、无法放松或拒绝面对问题。" },
+            { name: "宝剑5", upright: "https://w.taluo.com/pa/bj5z.jpg", reversed: "https://w.taluo.com/pa/bj5n.jpg", meaning: "宝剑5代表冲突、竞争和胜利。正位时，它象征着通过冲突获得的胜利，但可能伴随着人际关系的紧张。逆位可能表示和解、放弃竞争或承认失败。" },
+            { name: "宝剑6", upright: "https://w.taluo.com/pa/bj6z.jpg", reversed: "https://w.taluo.com/pa/bj6n.jpg", meaning: "宝剑6象征着过渡、旅行和疗愈。正位时，它代表着艰难时期的结束，开始新的旅程和情感的疗愈。逆位可能表示过渡困难、旅程受阻或疗愈延迟。" },
+            { name: "宝剑7", upright: "https://w.taluo.com/pa/bj7z.jpg", reversed: "https://w.taluo.com/pa/bj7n.jpg", meaning: "宝剑7代表策略、机智和欺骗。正位时，它象征着通过策略和机智获得优势，但可能涉及不诚实的手段。逆位可能表示被欺骗、策略失败或缺乏诚信。" },
+            { name: "宝剑8", upright: "https://w.taluo.com/pa/bj8z.jpg", reversed: "https://w.taluo.com/pa/bj8n.jpg", meaning: "宝剑8象征着限制、恐惧和束缚。正位时，它代表着自我施加的限制、恐惧和情感的束缚。逆位可能表示打破限制、克服恐惧或获得自由。" },
+            { name: "宝剑9", upright: "https://w.taluo.com/pa/bj9z.jpg", reversed: "https://w.taluo.com/pa/bj9n.jpg", meaning: "宝剑9代表焦虑、恐惧和噩梦。正位时，它象征着深深的焦虑、恐惧和困扰的思绪。逆位可能表示减轻焦虑、克服恐惧或心理疗愈。" },
+            { name: "宝剑10", upright: "https://w.taluo.com/pa/bj10z.jpg", reversed: "https://w.taluo.com/pa/bj10n.jpg", meaning: "宝剑10代表结束、痛苦和转变。正位时，它象征着某个阶段的痛苦结束，以及随之而来的转变。逆位可能表示结束延迟、抗拒改变或痛苦减轻。" },
+            { name: "宝剑侍从", upright: "https://w.taluo.com/pa/bjscz.jpg", reversed: "https://w.taluo.com/pa/bjscn.jpg", meaning: "宝剑侍从代表好奇心、学习和沟通。正位时，它象征着对知识的好奇心、学习的热情和良好的沟通能力。逆位可能表示好奇心缺乏、沟通不畅或学习困难。" },
+            { name: "宝剑骑士", upright: "https://w.taluo.com/pa/bjqsz.jpg", reversed: "https://w.taluo.com/pa/bjqsn.jpg", meaning: "宝剑骑士象征着行动、挑战和直言不讳。正位时，它代表着果断的行动、勇于挑战和直言不讳的态度。逆位可能表示冲动、鲁莽或言语伤人。" },
+            { name: "宝剑王后", upright: "https://w.taluo.com/pa/bjhhz.jpg", reversed: "https://w.taluo.com/pa/bjhhn.jpg", meaning: "宝剑王后代表智慧、独立和清晰的思维。正位时，它象征着聪明、独立和思维清晰的女性形象。逆位可能表示冷酷无情、缺乏同理心或思维混乱。" },
+            { name: "宝剑国王", upright: "https://w.taluo.com/pa/bjgwz.jpg", reversed: "https://w.taluo.com/pa/bjgwn.jpg", meaning: "宝剑国王象征着权威、智慧和公正。正位时，它代表着有权威、智慧和公正的领导者，能够做出明智的决策。逆位可能表示冷酷、偏见或滥用权力。" },
+            
+            // 星币系列
+            { name: "星币1", upright: "https://w.taluo.com/pa/xb1z.jpg", reversed: "https://w.taluo.com/pa/xb1n.jpg", meaning: "星币1代表新的机会、财富和物质基础。正位时，它象征着新的财务机会、物质上的稳定和坚实的基础。逆位可能表示错失机会、财务困难或基础不稳。" },
+            { name: "星币2", upright: "https://w.taluo.com/pa/xb2z.jpg", reversed: "https://w.taluo.com/pa/xb2n.jpg", meaning: "星币2象征着平衡、灵活和选择。正位时，它代表着在财务和生活中保持平衡，灵活应对变化和做出明智的选择。逆位可能表示不平衡、犹豫不决或财务不稳定。" },
+            { name: "星币3", upright: "https://w.taluo.com/pa/xb3z.jpg", reversed: "https://w.taluo.com/pa/xb3n.jpg", meaning: "星币3代表合作、技能和创造力。正位时，它象征着通过合作实现目标，发挥技能和创造力获得成功。逆位可能表示合作困难、技能未被充分利用或创造力受阻。" },
+            { name: "星币4", upright: "https://w.taluo.com/pa/xb4z.jpg", reversed: "https://w.taluo.com/pa/xb4n.jpg", meaning: "星币4象征着稳定、安全和保守。正位时，它代表着财务上的稳定、安全感和谨慎管理资源。逆位可能表示过度保守、贪婪或财务损失。" },
+            { name: "星币5", upright: "https://w.taluo.com/pa/xb5z.jpg", reversed: "https://w.taluo.com/pa/xb5n.jpg", meaning: "星币5代表困难、贫困和挑战。正位时，它象征着财务困难、物质匮乏和生活中的挑战。逆位可能表示克服困难、财务改善或寻求帮助。" },
+            { name: "星币6", upright: "https://w.taluo.com/pa/xb6z.jpg", reversed: "https://w.taluo.com/pa/xb6n.jpg", meaning: "星币6象征着给予、接受和慷慨。正位时，它代表着慷慨的给予和明智的接受，以及资源的公平分配。逆位可能表示不平等、贪婪或吝啬。" },
+            { name: "星币7", upright: "https://w.taluo.com/pa/xb7z.jpg", reversed: "https://w.taluo.com/pa/xb7n.jpg", meaning: "星币7代表耐心、投资和收获。正位时，它象征着对长期目标的耐心、明智的投资和未来的收获。逆位可能表示不耐烦、投资不当或收获延迟。" },
+            { name: "星币8", upright: "https://w.taluo.com/pa/xb8z.jpg", reversed: "https://w.taluo.com/pa/xb8n.jpg", meaning: "星币8象征着努力、技能和专注。正位时，它代表着勤奋工作、不断提升技能和专注于目标。逆位可能表示懒惰、缺乏专注或技能不足。" },
+            { name: "星币9", upright: "https://w.taluo.com/pa/xb9z.jpg", reversed: "https://w.taluo.com/pa/xb9n.jpg", meaning: "星币9代表独立、成功和自给自足。正位时，它象征着财务独立、事业成功和自给自足的能力。逆位可能表示依赖他人、财务困难或缺乏自信。" },
+            { name: "星币10", upright: "https://w.taluo.com/pa/xb10z.jpg", reversed: "https://w.taluo.com/pa/xb10n.jpg", meaning: "星币10象征着财富、遗产和家庭稳定。正位时，它代表着财务富足、家庭的稳定和留给后代的遗产。逆位可能表示财务损失、家庭冲突或遗产问题。" },
+            { name: "星币侍从", upright: "https://w.taluo.com/pa/xbscz.jpg", reversed: "https://w.taluo.com/pa/xbscn.jpg", meaning: "星币侍从代表务实、学习和责任感。正位时，它象征着务实的态度、学习实用技能和负责任的行为。逆位可能表示不负责任、不切实际或学习困难。" },
+            { name: "星币骑士", upright: "https://w.taluo.com/pa/xbqsz.jpg", reversed: "https://w.taluo.com/pa/xbqsn.jpg", meaning: "星币骑士象征着踏实、耐心和可靠。正位时，它代表着踏实肯干、有耐心和可靠的品质，能够稳步实现目标。逆位可能表示懒惰、不可靠或缺乏耐心。" },
+            { name: "星币王后", upright: "https://w.taluo.com/pa/xbhhz.jpg", reversed: "https://w.taluo.com/pa/xbhhn.jpg", meaning: "星币王后代表富足、务实和慷慨。正位时，它象征着生活富足、务实的态度和对他人的慷慨。逆位可能表示贪婪、物质主义或缺乏实际感。" },
+            { name: "星币国王", upright: "https://w.taluo.com/pa/xbgwz.jpg", reversed: "https://w.taluo.com/pa/xbgwn.jpg", meaning: "星币国王象征着财富、成功和权威。正位时，它代表着财务成功、有权威和负责任的领导者，能够创造和管理财富。逆位可能表示财务失败、滥用权力或不负责任。" }
         ];
 
         // 牌阵配置
@@ -808,7 +882,12 @@
                 spreadDescription.textContent = currentSpread.description;
                 
                 // 重置牌阵容器
-                spreadContainer.innerHTML = '<div class="text-light/50 text-center"><i class="fa fa-hand-o-up text-3xl mb-4 block animate-bounce"></i> 请静心10秒钟专注于思考你的问题，然后点击抽牌按钮</div>';
+                spreadContainer.innerHTML = `
+                    <div class="prompt-container">
+                        <i class="fa fa-hand-o-up text-3xl mb-4 block animate-bounce"></i>
+                        <p class="text-light/50 text-center">请静心10秒钟专注于思考你的问题，然后点击抽牌按钮</p>
+                    </div>
+                `;
                 cardMeaning.classList.add('hidden');
                 
                 // 显示占卜区域，隐藏牌阵选择区域
@@ -853,8 +932,8 @@
                 const randomIndex = Math.floor(Math.random() * availableCards.length);
                 const selectedCard = availableCards.splice(randomIndex, 1)[0];
                 
-                // 随机决定正逆位
-                const isUpright = Math.random() > 0.5; // 50% 正位，50% 逆位
+                // 随机决定正逆位，概率各50%
+                const isUpright = Math.random() > 0.5;
                 
                 drawnCards.push({
                     ...selectedCard,
