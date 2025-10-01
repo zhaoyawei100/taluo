@@ -68,6 +68,18 @@
             /* 牌尺寸优化，保持307×540的比例 */
             .tarot-card {
                 transition: all 0.3s ease;
+                /* 移动端增大卡片尺寸，PC端保持原尺寸 */
+                width: clamp(60px, 20vw, 100px);
+                height: calc(clamp(60px, 20vw, 100px) * 540 / 307);
+            }
+            /* 三行牌阵专用样式 - 更紧凑 */
+            .three-row-card {
+                width: clamp(50px, 16vw, 85px);
+                height: calc(clamp(50px, 16vw, 85px) * 540 / 307);
+            }
+            /* 周运和年运牌阵保持原有尺寸 */
+            .week-spread-container .tarot-card,
+            .year-spread-container .tarot-card {
                 width: clamp(40px, 9vw, 100px);
                 height: calc(clamp(40px, 9vw, 100px) * 540 / 307);
             }
@@ -82,12 +94,12 @@
                 justify-content: center;
                 align-items: center;
                 width: 100%;
-                padding: 1rem; /* 增加内边距确保边缘内容可见 */
+                padding: 1rem;
                 margin: 0 auto;
                 box-sizing: border-box;
-                overflow: visible; /* 允许内容完整显示 */
+                overflow: visible;
                 min-height: 150px;
-                max-height: 75vh; /* 增加最大高度限制 */
+                max-height: 75vh; /* 确保在手机一屏内 */
             }
             .spread-row {
                 display: flex;
@@ -95,13 +107,13 @@
                 align-items: center;
                 flex-wrap: wrap;
                 width: 100%;
-                gap: clamp(0.15rem, 0.5vw, 0.5rem);
-                margin-bottom: clamp(0.5rem, 1vw, 1rem); /* 增加行间距确保各行分离 */
+                gap: clamp(0.25rem, 1vw, 0.5rem);
+                margin-bottom: clamp(0.75rem, 2vw, 1rem);
             }
             .spread-grid {
                 display: grid;
                 width: 100%;
-                gap: clamp(0.15rem, 0.5vw, 0.5rem);
+                gap: clamp(0.25rem, 1vw, 0.5rem);
             }
             .tarot-card-wrapper {
                 display: flex;
@@ -111,23 +123,34 @@
                 padding: 0;
                 flex: 0 0 auto;
             }
+            /* 三行牌阵专用容器 - 更紧凑的间距 */
+            .three-row-wrapper {
+                gap: clamp(0.1rem, 0.5vw, 0.3rem);
+            }
             /* 卡片下方说明文字容器 */
             .card-info {
                 width: 100%;
-                min-height: 20px;
+                min-height: 24px;
                 text-align: center;
                 padding: 0.1rem 0 0;
-                margin-top: 0.1rem;
+                margin-top: 0.25rem;
+                font-size: 12px;
             }
-            /* 年运牌阵特殊样式 */
+            /* 三行牌阵文字更小更紧凑 */
+            .three-row-info {
+                font-size: 10px;
+                margin-top: 0.15rem;
+                min-height: 20px;
+            }
+            /* 年运牌阵特殊样式 - 不调整 */
             .year-spread-container {
                 display: flex;
                 flex-direction: column;
-                gap: 0.5rem; /* 增加行间距 */
+                gap: 0.5rem;
                 width: 100%;
                 overflow: visible;
                 max-height: 70vh;
-                padding: 0.5rem; /* 增加内边距 */
+                padding: 0.5rem;
             }
             .year-spread-row {
                 display: flex;
@@ -136,13 +159,13 @@
                 gap: clamp(0.1rem, 0.3vw, 0.3rem);
                 width: 100%;
             }
-            /* 周运牌阵样式 */
+            /* 周运牌阵样式 - 不调整 */
             .week-spread-container {
                 display: flex;
                 flex-direction: column;
-                gap: 0.5rem; /* 增加行间距 */
+                gap: 0.5rem;
                 width: 100%;
-                padding: 0.5rem; /* 增加内边距 */
+                padding: 0.5rem;
             }
             .week-spread-row {
                 display: flex;
@@ -151,14 +174,14 @@
                 gap: clamp(0.1rem, 0.3vw, 0.3rem);
                 width: 100%;
             }
-            /* 金字塔牌阵特殊优化 - 解决顶部卡片被遮挡问题 */
+            /* 金字塔牌阵特殊优化 - 更紧凑 */
             .pyramid-spread {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 0.8rem; /* 增加行间距 */
+                gap: clamp(0.4rem, 1.5vw, 0.8rem); /* 缩小行间距 */
                 width: 100%;
-                padding: 1.5rem 0.5rem; /* 增加顶部和两侧内边距 */
+                padding: clamp(0.5rem, 3vw, 1rem) 0.5rem; /* 减少内边距 */
                 box-sizing: border-box;
             }
             /* 十字牌阵优化 */
@@ -167,25 +190,25 @@
                 grid-template-columns: auto auto auto;
                 grid-template-rows: auto auto auto;
                 justify-content: center;
-                gap: 0.8rem; /* 增加间距 */
+                gap: clamp(0.8rem, 3vw, 1.5rem);
                 width: 100%;
-                padding: 1.5rem; /* 增加内边距避免边缘裁切 */
+                padding: clamp(1rem, 5vw, 1.5rem);
                 box-sizing: border-box;
             }
-            /* 三行布局特殊优化 */
+            /* 三行布局特殊优化 - 更紧凑 */
             .three-row-layout {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 0.8rem; /* 足够的行间距 */
+                gap: clamp(0.4rem, 1.5vw, 0.8rem); /* 缩小行间距 */
                 width: 100%;
-                padding: 1rem 0.5rem; /* 上下内边距确保首末行完整显示 */
+                padding: clamp(0.5rem, 3vw, 1rem) 0.5rem; /* 减少内边距 */
             }
             .three-row-layout .row {
                 display: flex;
                 justify-content: center;
                 flex-wrap: wrap;
-                gap: clamp(0.15rem, 0.5vw, 0.5rem);
+                gap: clamp(0.2rem, 0.8vw, 0.4rem); /* 缩小牌间距 */
                 width: 100%;
             }
             /* 牌阵卡片特殊样式 */
@@ -202,6 +225,73 @@
                 flex-direction: column;
                 align-items: center;
                 gap: 1rem;
+            }
+            /* 选择类牌阵布局（二选一和三选一统一风格）- 更紧凑 */
+            .choices-layout {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                padding: 0.5rem 0; /* 减少内边距 */
+                gap: clamp(0.6rem, 2vw, 1.2rem); /* 缩小间距 */
+            }
+            .choices-core {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
+            .choices-options {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                gap: clamp(0.6rem, 2vw, 1.2rem); /* 缩小间距 */
+            }
+            .choice-column {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: clamp(0.4rem, 1.5vw, 0.8rem); /* 缩小列内间距 */
+            }
+            .choices-row {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                gap: clamp(1rem, 5vw, 3rem); /* 缩小选项间距 */
+            }
+            /* 重新抽牌按钮容器 - 增加与牌的距离 */
+            .draw-button-container {
+                margin-top: 2rem; /* 确保与牌有足够距离 */
+            }
+            /* 响应式调整 */
+            @media (max-width: 768px) {
+                /* 手机端优化牌阵布局 */
+                .cross-spread {
+                    gap: 0.5rem;
+                    padding: 0.5rem;
+                }
+                
+                .pyramid-spread {
+                    gap: 0.3rem;
+                    padding: 0.3rem;
+                }
+                
+                /* 减少牌阵容器的最大高度，确保一屏显示 */
+                .spread-container:not(.year-spread-container):not(.week-spread-container) {
+                    max-height: 65vh;
+                }
+                
+                /* 调整多行布局的行距 */
+                .three-row-layout,
+                .two-choices-spread {
+                    gap: 0.3rem;
+                    padding: 0.3rem 0;
+                }
+                
+                /* 移动端选择类牌阵调整 */
+                .choices-row {
+                    gap: clamp(0.8rem, 4vw, 2rem);
+                }
             }
         }
     </style>
@@ -297,6 +387,7 @@
                 
                 <!-- 牌阵网格 -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 牌阵内容保持不变 -->
                     <!-- 单张牌阵 -->
                     <div class="spread-card bg-dark/50 backdrop-blur border border-primary/20 rounded-xl p-6 hover:border-secondary/50 transition-all duration-300 group" data-category="basic">
                         <div class="flex justify-between items-start mb-4">
@@ -468,6 +559,7 @@
                 <div class="max-w-2xl mx-auto mb-10">
                     <label for="question" class="block mb-2 text-lg">你的问题：</label>
                     <textarea id="question" class="w-full bg-dark/50 border border-primary/30 rounded-lg p-4 text-light focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary transition-all" rows="3" placeholder="请输入你想询问的问题，例如：我的爱情会有新的发展吗？"></textarea>
+                    <p id="question-error" class="text-red-400 text-sm mt-1 hidden">请输入你的问题后再抽牌</p>
                 </div>
                 
                 <!-- 抽牌按钮 -->
@@ -499,8 +591,8 @@
                     </div>
                 </div>
                 
-                <!-- 重新占卜按钮 -->
-                <div class="text-center mt-10">
+                <!-- 重新占卜按钮 - 增加与牌的距离 -->
+                <div class="text-center draw-button-container mt-6">
                     <button id="restart-reading" class="py-2 px-6 rounded-full bg-primary/20 hover:bg-primary/40 transition-colors">
                         <i class="fa fa-refresh mr-2"></i> 重新占卜
                     </button>
@@ -774,7 +866,7 @@
                 cardCount: 7,
                 positions: ["1.你的真实需求", "2.选择A的发展", "3.选择B的发展", "4.选择C的发展", "5.选择A的结果", "6.选择B的结果", "7.选择C的结果"]
             },
-            "weekly": {  // 周运牌阵
+            "weekly": {  // 周运牌阵 - 不调整
                 name: "周运势",
                 description: "周运势牌阵预测未来一周的每日运势，帮助你了解一周内的趋势和重要事项。",
                 cardCount: 7,
@@ -786,7 +878,7 @@
                 cardCount: 5,
                 positions: ["1.月度第1周", "2.月度第2周", "3.月度第3周", "4.月度第4周", "5.整月概览"]
             },
-            "yearly": {
+            "yearly": {  // 年运牌阵 - 不调整
                 name: "新年12月运",
                 description: "新年12月运牌阵展望新一年的每月运势，揭示每个月的主要趋势、挑战和机遇，帮助你把握全年的整体发展。",
                 cardCount: 12,
@@ -816,6 +908,8 @@
         const meaningCardName = document.getElementById('meaning-card-name');
         const meaningCardOrientation = document.getElementById('meaning-card-orientation');
         const meaningDescription = document.getElementById('meaning-description');
+        const questionInput = document.getElementById('question');
+        const questionError = document.getElementById('question-error');
 
         // 移动端菜单切换
         menuToggle.addEventListener('click', () => {
@@ -889,6 +983,8 @@
                     </div>
                 `;
                 cardMeaning.classList.add('hidden');
+                questionInput.value = '';
+                questionError.classList.add('hidden');
                 
                 // 显示占卜区域，隐藏牌阵选择区域
                 spreadsSection.classList.add('hidden');
@@ -912,8 +1008,27 @@
             spreadsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
 
+        // 输入问题时隐藏错误提示
+        questionInput.addEventListener('input', () => {
+            if (questionInput.value.trim() !== '') {
+                questionError.classList.add('hidden');
+            }
+        });
+
         // 抽牌功能
         drawCardsBtn.addEventListener('click', () => {
+            // 验证问题输入
+            const question = questionInput.value.trim();
+            if (!question) {
+                questionError.classList.remove('hidden');
+                // 添加抖动动画
+                questionInput.classList.add('animate-shake');
+                setTimeout(() => {
+                    questionInput.classList.remove('animate-shake');
+                }, 500);
+                return;
+            }
+            
             if (!currentSpread) return;
             
             // 禁用按钮
@@ -945,13 +1060,16 @@
             // 延迟显示牌，创造抽牌动画效果
             setTimeout(() => {
                 // 移除所有布局类
-                spreadContainer.classList.remove('spread-row', 'spread-grid', 'flex', 'grid', 'flex-col', 'flex-wrap', 'year-spread-container', 'pyramid-spread', 'cross-spread', 'two-choices-spread', 'week-spread-container', 'three-row-layout');
+                spreadContainer.classList.remove('spread-row', 'spread-grid', 'flex', 'grid', 'flex-col', 'flex-wrap', 'year-spread-container', 'pyramid-spread', 'cross-spread', 'two-choices-spread', 'week-spread-container', 'three-row-layout', 'less-than-layout', 'choices-layout');
+                
+                // 标记是否为需要紧凑显示的三行牌阵
+                const isThreeRowSpread = ['lover-pyramid', 'career-pyramid', 'two-choices', 'three-choices', 'three-general', 'three-timeline', 'three-solution'].includes(currentSpread.name.toLowerCase().replace(/\s+/g, '-'));
                 
                 // 根据不同牌阵布局显示牌，确保完整展示所有行
                 if (currentSpread.cardCount === 1) {
                     // 单张牌布局 - 居中显示
                     spreadContainer.classList.add('flex', 'justify-center', 'py-2');
-                    spreadContainer.innerHTML = createCardElement(drawnCards[0], 0);
+                    spreadContainer.innerHTML = createCardElement(drawnCards[0], 0, isThreeRowSpread);
                 } 
                 // 3张牌布局 - 特别优化确保完整显示
                 else if (currentSpread.cardCount === 3) {
@@ -962,7 +1080,7 @@
                     const row = document.createElement('div');
                     row.className = 'row';
                     drawnCards.forEach((card, index) => {
-                        row.innerHTML += createCardElement(card, index);
+                        row.innerHTML += createCardElement(card, index, isThreeRowSpread);
                     });
                     spreadContainer.appendChild(row);
                 }
@@ -972,20 +1090,20 @@
                         // 恋人金字塔优化：增加顶部空间
                         spreadContainer.classList.add('pyramid-spread');
                         // 顶层 - 第一张牌
-                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0, 'pyramid-top');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0, isThreeRowSpread, 'pyramid-top');
                         // 中层
                         const middleRow = document.createElement('div');
                         middleRow.className = 'flex gap-2';
-                        middleRow.innerHTML += createCardElement(drawnCards[1], 1);
-                        middleRow.innerHTML += createCardElement(drawnCards[2], 2);
+                        middleRow.innerHTML += createCardElement(drawnCards[1], 1, isThreeRowSpread);
+                        middleRow.innerHTML += createCardElement(drawnCards[2], 2, isThreeRowSpread);
                         spreadContainer.appendChild(middleRow);
                         // 底层
-                        spreadContainer.innerHTML += createCardElement(drawnCards[3], 3);
+                        spreadContainer.innerHTML += createCardElement(drawnCards[3], 3, isThreeRowSpread);
                     } else {
                         // 普通4张牌水平布局
                         spreadContainer.classList.add('spread-row');
                         drawnCards.forEach((card, index) => {
-                            spreadContainer.innerHTML += createCardElement(card, index);
+                            spreadContainer.innerHTML += createCardElement(card, index, isThreeRowSpread);
                         });
                     }
                 }
@@ -994,63 +1112,71 @@
                     if (currentSpread.name === "爱情大十字") {
                         // 爱情大十字优化
                         spreadContainer.classList.add('cross-spread');
-                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0, 'cross-top');
-                        spreadContainer.innerHTML += createCardElement(drawnCards[1], 1, 'cross-left');
-                        spreadContainer.innerHTML += createCardElement(drawnCards[2], 2, 'cross-center');
-                        spreadContainer.innerHTML += createCardElement(drawnCards[3], 3, 'cross-right');
-                        spreadContainer.innerHTML += createCardElement(drawnCards[4], 4, 'cross-bottom');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0, isThreeRowSpread, 'cross-top');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[1], 1, isThreeRowSpread, 'cross-left');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[2], 2, isThreeRowSpread, 'cross-center');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[3], 3, isThreeRowSpread, 'cross-right');
+                        spreadContainer.innerHTML += createCardElement(drawnCards[4], 4, isThreeRowSpread, 'cross-bottom');
                     } else if (currentSpread.name === "月运势") {
                         // 月运布局：4周+1概览
                         spreadContainer.classList.add('flex', 'flex-wrap', 'justify-center', 'gap-1', 'py-2');
                         // 前4张水平排列（周运势）
                         for (let i = 0; i < 4; i++) {
-                            spreadContainer.innerHTML += createCardElement(drawnCards[i], i);
+                            spreadContainer.innerHTML += createCardElement(drawnCards[i], i, isThreeRowSpread);
                         }
                         // 第5张（月概览）单独一行居中
                         const overviewRow = document.createElement('div');
                         overviewRow.className = 'w-full flex justify-center mt-2';
-                        overviewRow.innerHTML += createCardElement(drawnCards[4], 4);
+                        overviewRow.innerHTML += createCardElement(drawnCards[4], 4, isThreeRowSpread);
                         spreadContainer.appendChild(overviewRow);
                     } else if (currentSpread.name === "二选一") {
-                        // 二选一布局
-                        spreadContainer.classList.add('two-choices-spread', 'py-2');
+                        // 二选一布局（与三选一风格统一）
+                        spreadContainer.classList.add('choices-layout', 'py-2');
                         
-                        // 第一行：你的真实需求
-                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0);
+                        // 核心牌（真实需求）
+                        const coreCard = document.createElement('div');
+                        coreCard.className = 'choices-core';
+                        coreCard.innerHTML = createCardElement(drawnCards[0], 0, isThreeRowSpread);
+                        spreadContainer.appendChild(coreCard);
                         
-                        // 第二行：两个选择的布局
+                        // 选项区域
                         const optionsContainer = document.createElement('div');
-                        optionsContainer.className = 'two-choices-options';
+                        optionsContainer.className = 'choices-options';
                         
-                        // 左侧：选择A的发展和结果
-                        const columnA = document.createElement('div');
-                        columnA.className = 'two-choices-column';
-                        columnA.innerHTML += createCardElement(drawnCards[1], 1); // 选择A的发展
-                        columnA.innerHTML += createCardElement(drawnCards[2], 2); // 选择A的结果
-                        optionsContainer.appendChild(columnA);
+                        // 选项行
+                        const optionsRow = document.createElement('div');
+                        optionsRow.className = 'choices-row';
                         
-                        // 右侧：选择B的发展和结果
-                        const columnB = document.createElement('div');
-                        columnB.className = 'two-choices-column';
-                        columnB.innerHTML += createCardElement(drawnCards[3], 3); // 选择B的发展
-                        columnB.innerHTML += createCardElement(drawnCards[4], 4); // 选择B的结果
-                        optionsContainer.appendChild(columnB);
+                        // 选择A列（发展+结果）
+                        const optionAColumn = document.createElement('div');
+                        optionAColumn.className = 'choice-column';
+                        optionAColumn.innerHTML += createCardElement(drawnCards[1], 1, isThreeRowSpread); // 选择A的发展
+                        optionAColumn.innerHTML += createCardElement(drawnCards[2], 2, isThreeRowSpread); // 选择A的结果
+                        optionsRow.appendChild(optionAColumn);
                         
+                        // 选择B列（发展+结果）
+                        const optionBColumn = document.createElement('div');
+                        optionBColumn.className = 'choice-column';
+                        optionBColumn.innerHTML += createCardElement(drawnCards[3], 3, isThreeRowSpread); // 选择B的发展
+                        optionBColumn.innerHTML += createCardElement(drawnCards[4], 4, isThreeRowSpread); // 选择B的结果
+                        optionsRow.appendChild(optionBColumn);
+                        
+                        optionsContainer.appendChild(optionsRow);
                         spreadContainer.appendChild(optionsContainer);
                     } else {
                         // 普通5张牌使用2行布局（2+3）
                         spreadContainer.classList.add('flex', 'flex-col', 'items-center', 'gap-1', 'py-2');
                         const row1 = document.createElement('div');
                         row1.className = 'flex gap-1';
-                        row1.innerHTML += createCardElement(drawnCards[0], 0);
-                        row1.innerHTML += createCardElement(drawnCards[1], 1);
+                        row1.innerHTML += createCardElement(drawnCards[0], 0, isThreeRowSpread);
+                        row1.innerHTML += createCardElement(drawnCards[1], 1, isThreeRowSpread);
                         spreadContainer.appendChild(row1);
                         
                         const row2 = document.createElement('div');
                         row2.className = 'flex gap-1';
-                        row2.innerHTML += createCardElement(drawnCards[2], 2);
-                        row2.innerHTML += createCardElement(drawnCards[3], 3);
-                        row2.innerHTML += createCardElement(drawnCards[4], 4);
+                        row2.innerHTML += createCardElement(drawnCards[2], 2, isThreeRowSpread);
+                        row2.innerHTML += createCardElement(drawnCards[3], 3, isThreeRowSpread);
+                        row2.innerHTML += createCardElement(drawnCards[4], 4, isThreeRowSpread);
                         spreadContainer.appendChild(row2);
                     }
                 }
@@ -1060,56 +1186,65 @@
                     spreadContainer.classList.add('pyramid-spread');
                     
                     // 顶层
-                    spreadContainer.innerHTML += createCardElement(drawnCards[0], 0);
+                    spreadContainer.innerHTML += createCardElement(drawnCards[0], 0, isThreeRowSpread);
                     
                     // 中层
                     const middleRow = document.createElement('div');
                     middleRow.className = 'flex gap-1';
-                    middleRow.innerHTML += createCardElement(drawnCards[1], 1);
-                    middleRow.innerHTML += createCardElement(drawnCards[2], 2);
+                    middleRow.innerHTML += createCardElement(drawnCards[1], 1, isThreeRowSpread);
+                    middleRow.innerHTML += createCardElement(drawnCards[2], 2, isThreeRowSpread);
                     spreadContainer.appendChild(middleRow);
                     
                     // 底层
                     const bottomRow = document.createElement('div');
                     bottomRow.className = 'flex gap-1';
-                    bottomRow.innerHTML += createCardElement(drawnCards[3], 3);
-                    bottomRow.innerHTML += createCardElement(drawnCards[4], 4);
-                    bottomRow.innerHTML += createCardElement(drawnCards[5], 5);
+                    bottomRow.innerHTML += createCardElement(drawnCards[3], 3, isThreeRowSpread);
+                    bottomRow.innerHTML += createCardElement(drawnCards[4], 4, isThreeRowSpread);
+                    bottomRow.innerHTML += createCardElement(drawnCards[5], 5, isThreeRowSpread);
                     spreadContainer.appendChild(bottomRow);
                 }
                 // 7张牌布局
                 else if (currentSpread.cardCount === 7) {
                     if (currentSpread.name === "三选一") {
-                        // 三选一优化
-                        spreadContainer.classList.add('flex', 'flex-col', 'items-center', 'gap-2', 'py-2');
+                        // 三选一布局
+                        spreadContainer.classList.add('choices-layout', 'py-2');
                         
-                        // 第1张（真实需求）
-                        spreadContainer.innerHTML += createCardElement(drawnCards[0], 0);
+                        // 核心牌（真实需求）
+                        const coreCard = document.createElement('div');
+                        coreCard.className = 'choices-core';
+                        coreCard.innerHTML = createCardElement(drawnCards[0], 0, isThreeRowSpread);
+                        spreadContainer.appendChild(coreCard);
                         
-                        // 中间行：3个选择的发展
-                        const middleRow = document.createElement('div');
-                        middleRow.className = 'flex flex-wrap justify-center gap-1 w-full';
+                        // 选项区域
+                        const optionsContainer = document.createElement('div');
+                        optionsContainer.className = 'choices-options';
+                        
+                        // 发展行
+                        const developmentRow = document.createElement('div');
+                        developmentRow.className = 'choices-row';
                         for (let i = 1; i < 4; i++) {
-                            middleRow.innerHTML += createCardElement(drawnCards[i], i);
+                            developmentRow.innerHTML += createCardElement(drawnCards[i], i, isThreeRowSpread);
                         }
-                        spreadContainer.appendChild(middleRow);
+                        optionsContainer.appendChild(developmentRow);
                         
-                        // 底行：3个选择的结果
-                        const bottomRow = document.createElement('div');
-                        bottomRow.className = 'flex flex-wrap justify-center gap-1 w-full';
+                        // 结果行
+                        const resultRow = document.createElement('div');
+                        resultRow.className = 'choices-row';
                         for (let i = 4; i < 7; i++) {
-                            bottomRow.innerHTML += createCardElement(drawnCards[i], i);
+                            resultRow.innerHTML += createCardElement(drawnCards[i], i, isThreeRowSpread);
                         }
-                        spreadContainer.appendChild(bottomRow);
+                        optionsContainer.appendChild(resultRow);
+                        
+                        spreadContainer.appendChild(optionsContainer);
                     } else if (currentSpread.name === "周运势") {
-                        // 周运布局：3+4两排排列
+                        // 周运布局：3+4两排排列 - 不调整
                         spreadContainer.classList.add('week-spread-container');
                         
                         // 第一行：周一、周二、周三
                         const row1 = document.createElement('div');
                         row1.className = 'week-spread-row';
                         for (let i = 0; i < 3; i++) {
-                            row1.innerHTML += createCardElement(drawnCards[i], i);
+                            row1.innerHTML += createCardElement(drawnCards[i], i, isThreeRowSpread);
                         }
                         spreadContainer.appendChild(row1);
                         
@@ -1117,12 +1252,12 @@
                         const row2 = document.createElement('div');
                         row2.className = 'week-spread-row';
                         for (let i = 3; i < 7; i++) {
-                            row2.innerHTML += createCardElement(drawnCards[i], i);
+                            row2.innerHTML += createCardElement(drawnCards[i], i, isThreeRowSpread);
                         }
                         spreadContainer.appendChild(row2);
                     }
                 }
-                // 12张牌布局（新年12月运）
+                // 12张牌布局（新年12月运）- 不调整
                 else if (currentSpread.cardCount === 12) {
                     spreadContainer.classList.add('year-spread-container', 'py-2');
                     
@@ -1130,7 +1265,7 @@
                     const row1 = document.createElement('div');
                     row1.className = 'year-spread-row';
                     for (let i = 0; i < 6; i++) {
-                        row1.innerHTML += createCardElement(drawnCards[i], i);
+                        row1.innerHTML += createCardElement(drawnCards[i], i, isThreeRowSpread);
                     }
                     spreadContainer.appendChild(row1);
                     
@@ -1138,7 +1273,7 @@
                     const row2 = document.createElement('div');
                     row2.className = 'year-spread-row';
                     for (let i = 6; i < 12; i++) {
-                        row2.innerHTML += createCardElement(drawnCards[i], i);
+                        row2.innerHTML += createCardElement(drawnCards[i], i, isThreeRowSpread);
                     }
                     spreadContainer.appendChild(row2);
                 }
@@ -1169,14 +1304,18 @@
             }, 1000);
         });
 
-        // 创建牌元素
-        function createCardElement(card, index, customClass = '') {
+        // 创建牌元素 - 新增isThreeRow参数控制是否使用紧凑样式
+        function createCardElement(card, index, isThreeRow = false, customClass = '') {
             const orientationText = card.isUpright ? '正位' : '逆位';
             const additionalClass = customClass ? ` ${customClass}` : '';
+            // 为三行牌阵添加特殊类名
+            const tarotCardClass = isThreeRow ? 'tarot-card three-row-card' : 'tarot-card';
+            const wrapperClass = isThreeRow ? 'tarot-card-wrapper three-row-wrapper' : 'tarot-card-wrapper';
+            const infoClass = isThreeRow ? 'card-info three-row-info' : 'card-info';
             
             return `
-                <div class="tarot-card-wrapper${additionalClass}" data-index="${index}">
-                    <div class="tarot-card card-flip relative cursor-pointer mx-auto">
+                <div class="${wrapperClass}${additionalClass}" data-index="${index}">
+                    <div class="${tarotCardClass} card-flip relative cursor-pointer mx-auto">
                         <!-- 牌背 -->
                         <div class="card-front absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-lg shadow-lg flex items-center justify-center">
                             <i class="fa fa-moon-o text-4xl text-light/80"></i>
@@ -1190,7 +1329,7 @@
                         </div>
                     </div>
                     <!-- 牌信息区域 -->
-                    <div class="card-info">
+                    <div class="${infoClass}">
                         <h4 class="font-medium text-xs whitespace-nowrap overflow-hidden text-ellipsis">${card.name}</h4>
                         <p class="text-[10px] text-light/60">${orientationText}</p>
                     </div>
